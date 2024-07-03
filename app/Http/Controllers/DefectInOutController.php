@@ -75,9 +75,10 @@ class DefectInOutController extends Controller
     // }
 
     public function getMasterPlan(Request $request) {
-        $date = $request->date ? $request->date : date('Y-m-d');
-
         $additionalQuery = "";
+        if ($request->date) {
+            $additionalQuery .= " AND master_plan.tgl_plan = '".$request->date."' ";
+        }
         if ($request->line) {
             $additionalQuery .= " AND master_plan.sewing_line = '".$request->line."' ";
         }
@@ -92,8 +93,7 @@ class DefectInOutController extends Controller
             ')->
             leftJoin('act_costing', 'act_costing.id', '=', 'master_plan.id_ws')->
             whereRaw('
-                master_plan.cancel != "Y" AND
-                master_plan.tgl_plan = "'.$date.'"
+                master_plan.cancel != "Y"
                 '.$additionalQuery.'
             ')->
             get();
@@ -124,9 +124,10 @@ class DefectInOutController extends Controller
     }
 
     public function getDefectType(Request $request) {
-        $date = $request->date ? $request->date : date("Y-m-d");
-
         $additionalQuery = "";
+        if ($request->date) {
+            $additionalQuery .= " AND master_plan.tgl_plan = '".$request->date."' ";
+        }
         if ($request->line) {
             $additionalQuery .= " AND master_plan.sewing_line = '".$request->line."' ";
         }
@@ -149,8 +150,7 @@ class DefectInOutController extends Controller
             leftJoin("master_plan", "master_plan.id", "=", "output_defects.master_plan_id")->
             leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects.defect_type_id")->
             whereRaw("
-                output_defects.defect_status = 'defect' AND
-                master_plan.tgl_plan = '".$date."'
+                output_defects.defect_status = 'defect'
                 ".$additionalQuery."
             ")->
             whereRaw("so_det.color = master_plan.color")->
@@ -162,9 +162,10 @@ class DefectInOutController extends Controller
     }
 
     public function getDefectArea(Request $request) {
-        $date = $request->date ? $request->date : date("Y-m-d");
-
         $additionalQuery = "";
+        if ($request->date) {
+            $additionalQuery .= " AND master_plan.tgl_plan = '".$request->date."' ";
+        }
         if ($request->line) {
             $additionalQuery .= " AND master_plan.sewing_line = '".$request->line."' ";
         }
@@ -187,8 +188,7 @@ class DefectInOutController extends Controller
             leftJoin("master_plan", "master_plan.id", "=", "output_defects.master_plan_id")->
             leftJoin("output_defect_areas", "output_defect_areas.id", "=", "output_defects.defect_area_id")->
             whereRaw("
-                output_defects.defect_status = 'defect' AND
-                master_plan.tgl_plan = '".$date."'
+                output_defects.defect_status = 'defect'
                 ".$additionalQuery."
             ")->
             whereRaw("so_det.color = master_plan.color")->

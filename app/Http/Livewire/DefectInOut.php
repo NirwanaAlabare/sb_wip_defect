@@ -58,12 +58,15 @@ class DefectInOut extends Component
     public $defectOutSelectedType;
     public $defectOutSelectedArea;
 
+    public $mode;
+
     public $loadingMasterPlan;
 
     public $baseUrl;
 
     public function mount()
     {
+        $this->mode = 'in';
         $this->lines = null;
         $this->orders = null;
 
@@ -95,6 +98,11 @@ class DefectInOut extends Component
 
         $this->loadingMasterPlan = false;
         $this->baseUrl = url('/');
+    }
+
+    public function changeMode($mode)
+    {
+        $this->mode = $mode;
     }
 
     public function updatingDefectInSearch()

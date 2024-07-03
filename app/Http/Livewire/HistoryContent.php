@@ -28,6 +28,11 @@ class HistoryContent extends Component
         $this->dateTo = $this->dateTo ? $this->dateTo : date('Y-m-d');
     }
 
+    public function updatingDefectInOutSearch()
+    {
+        $this->resetPage("defectInOutPage");
+    }
+
     public function render()
     {
         $masterPlan = session()->get('orderInfo');
@@ -83,7 +88,7 @@ class HistoryContent extends Component
                 ")->
                 orderBy("output_defect_in_out.updated_at", "desc")->
                 orderBy("output_defect_in_out.reworked_at", "desc")->
-                paginate(10, ['*'], 'defectOutPage');
+                paginate(10, ['*'], 'lastDefectOut');
 
         return view('livewire.history-content', [
             'latestDefectInOut' => $latestDefectInOut,

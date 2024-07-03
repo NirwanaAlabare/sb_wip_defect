@@ -1,5 +1,5 @@
 <div>
-    <div class="loading-container-fullscreen" wire:loading wire:target="preSaveSelectedDefectIn, saveSelectedDefectIn, saveCheckedDefectIn, saveAllDefectIn, preSaveSelectedDefectOut, saveSelectedDefectOut, saveCheckedDefectOut, saveAllDefectOut">
+    <div class="loading-container-fullscreen" wire:loading wire:target="changeMode, preSaveSelectedDefectIn, saveSelectedDefectIn, saveCheckedDefectIn, saveAllDefectIn, preSaveSelectedDefectOut, saveSelectedDefectOut, saveCheckedDefectOut, saveAllDefectOut">
         <div class="loading-container">
             <div class="loading"></div>
         </div>
@@ -10,8 +10,12 @@
         </div>
     </div>
     <div class="row g-3">
+        <div class="d-flex justify-content-center gap-1">
+            <button type="button" class="btn btn-sm btn-defect {{ $mode == "in" ? "active" : "" }}" {{ $mode == "in" ? "disabled" : "" }} wire:click="changeMode('in')">IN</button>
+            <button type="button" class="btn btn-sm btn-rework {{ $mode == "out" ? "active" : "" }}" {{ $mode == "out" ? "disabled" : "" }} wire:click="changeMode('out')">OUT</button>
+        </div>
         {{-- Defect IN --}}
-        <div class="col-12 col-md-12">
+        <div class="col-12 col-md-12 {{ $mode != "in" ? 'd-none' : ''}}">
             <div class="card">
                 <div class="card-header bg-defect">
                     <h5 class="card-title text-light text-center fw-bold">DEFECT IN</h5>
@@ -102,7 +106,7 @@
                                         <th>Size</th>
                                         <th>Type</th>
                                         <th>Qty</th>
-                                        <th><input class="form-check-input" type="checkbox" value="" id="defect-in-select-all" style="scale: 1.3"></th>
+                                        <th><input class="form-check-input" type="checkbox" value="" id="defect-in-select-all" onclick="defectInSelectAll(this)" style="scale: 1.3"></th>
                                         <th>IN</th>
                                     </tr>
                                 </thead>
@@ -202,9 +206,8 @@
             </div>
         </div>
 
-
         {{-- Defect OUT --}}
-        <div class="col-12 col-md-12">
+        <div class="col-12 col-md-12 {{ $mode != "out" ? 'd-none' : ''}}">
             <div class="card">
                 <div class="card-header bg-rework">
                     <h5 class="card-title text-light text-center fw-bold">DEFECT OUT</h5>
@@ -295,7 +298,7 @@
                                         <th>Size</th>
                                         <th>Type</th>
                                         <th>Qty</th>
-                                        <th><input class="form-check-input" type="checkbox" value="" id="defect-out-select-all" style="scale: 1.3"></th>
+                                        <th><input class="form-check-input" type="checkbox" value="" id="defect-out-select-all" onchange="defectOutSelectAll(this)" style="scale: 1.3"></th>
                                         <th>IN</th>
                                     </tr>
                                 </thead>
@@ -405,9 +408,127 @@
                 width: $( this ).data( 'width' ) ? $( this ).data( 'width' ) : $( this ).hasClass( 'w-100' ) ? '100%' : 'style',
                 placeholder: $( this ).data( 'placeholder' ),
             });
+
+            $('#select-defect-in-line').on('change', function (e) {
+                Livewire.emit("loadingStart");
+
+                let selectedDefectInLine = $('#select-defect-in-line').val();
+
+                @this.set('defectInLine', selectedDefectInLine);
+
+                getMasterPlanData();
+
+                getDefectType();
+                getDefectArea();
+            });
+
+            $('#select-defect-out-line').on('change', function (e) {
+                Livewire.emit("loadingStart");
+
+                let selectedDefectOutLine = $('#select-defect-out-line').val();
+
+                @this.set('defectOutLine', selectedDefectOutLine);
+
+                getMasterPlanData("out");
+
+                getDefectType("out");
+                getDefectArea("out");
+            });
+
+            $('#select-defect-in-master-plan').on('change', function (e) {
+                Livewire.emit("loadingStart");
+
+                let selectedDefectInMasterPlan = $('#select-defect-in-master-plan').val();
+
+                @this.set('defectInSelectedMasterPlan', selectedDefectInMasterPlan);
+
+                getSizeData();
+
+                getDefectType();
+                getDefectArea();
+            });
+
+            $('#select-defect-out-master-plan').on('change', function (e) {
+                Livewire.emit("loadingStart");
+
+                let selectedDefectOutMasterPlan = $('#select-defect-out-master-plan').val();
+
+                @this.set('defectOutSelectedMasterPlan', selectedDefectOutMasterPlan);
+
+                getSizeData("out");
+
+                getDefectType("out");
+                getDefectArea("out");
+            });
+
+            $('#select-defect-in-size').on('change', function (e) {
+                Livewire.emit("loadingStart");
+
+                let selectedDefectInSize = $('#select-defect-in-size').val();
+
+                @this.set('defectInSelectedSize', selectedDefectInSize);
+
+                getDefectType();
+                getDefectArea();
+            });
+
+            $('#select-defect-out-size').on('change', function (e) {
+                Livewire.emit("loadingStart");
+
+                let selectedDefectOutSize = $('#select-defect-out-size').val();
+
+                @this.set('defectOutSelectedSize', selectedDefectOutSize);
+
+                getDefectType("out");
+                getDefectArea("out");
+            });
+
+            $('#select-defect-in-type').on('change', function (e) {
+                Livewire.emit("loadingStart");
+
+                let selectedDefectInType = $('#select-defect-in-type').val();
+
+                @this.set('defectInSelectedType', selectedDefectInType);
+
+                getDefectArea();
+            });
+
+            $('#select-defect-out-type').on('change', function (e) {
+                Livewire.emit("loadingStart");
+
+                let selectedDefectOutType = $('#select-defect-out-type').val();
+
+                @this.set('defectOutSelectedType', selectedDefectOutType);
+
+                getDefectArea("out");
+            });
+
+            $('#select-defect-in-area').on('change', function (e) {
+                Livewire.emit("loadingStart");
+
+                let selectedDefectInType = $('#select-defect-in-area').val();
+
+                @this.set('defectInSelectedArea', selectedDefectInType);
+
+                getDefectType();
+            });
+
+            $('#select-defect-out-area').on('change', function (e) {
+                Livewire.emit("loadingStart");
+
+                let selectedDefectOutType = $('#select-defect-out-area').val();
+
+                @this.set('defectOutSelectedArea', selectedDefectOutType);
+
+                getDefectType("out");
+            });
         });
 
-        function getMasterPlanData(type = "in") {
+        function getMasterPlanData(type) {
+            if (type != "in" && type != "out") {
+                type = 'in';
+            }
+            console.log(type, $("#defect-"+type+"-date").val());
             $.ajax({
                 url: "{{ route("get-master-plan") }}",
                 method: "GET",
@@ -440,7 +561,10 @@
             });
         }
 
-        function getSizeData(type = "in") {
+        function getSizeData(type) {
+            if (type != "in" && type != "out") {
+                type = 'in';
+            }
             $.ajax({
                 url: "{{ route("get-size") }}",
                 method: "GET",
@@ -472,7 +596,10 @@
             });
         }
 
-        function getDefectType(type = "in") {
+        function getDefectType(type) {
+            if (type != "in" && type != "out") {
+                type = 'in';
+            }
             $.ajax({
                 url: "{{ route("get-defect-type") }}",
                 method: "GET",
@@ -506,7 +633,10 @@
             });
         }
 
-        function getDefectArea(type = "in") {
+        function getDefectArea(type) {
+            if (type != "in" && type != "out") {
+                type = 'in';
+            }
             $.ajax({
                 url: "{{ route("get-defect-area") }}",
                 method: "GET",
@@ -540,8 +670,8 @@
             });
         }
 
-        $('#defect-in-select-all').on('change', function (e) {
-            if (this.checked) {
+        function defectInSelectAll(element) {
+            if (element.checked) {
                 Livewire.emit("loadingStart");
 
                 @this.selectAllDefectIn();
@@ -550,133 +680,43 @@
 
                 @this.unselectAllDefectIn();
             }
-        });
+        }
 
-        $('#defect-out-select-all').on('change', function (e) {
-            if (this.checked) {
+        // $('#defect-in-select-all').on('change', function (e) {
+        //     if (this.checked) {
+        //         Livewire.emit("loadingStart");
+
+        //         @this.selectAllDefectIn();
+        //     } else {
+        //         Livewire.emit("loadingStart");
+
+        //         @this.unselectAllDefectIn();
+        //     }
+        // });
+
+        function defectOutSelectAll(element) {
+            if (element.checked) {
                 Livewire.emit("loadingStart");
 
-                @this.selectAllDefectOut("out");
+                @this.selectAllDefectOut();
             } else {
                 Livewire.emit("loadingStart");
 
-                @this.unselectAllDefectOut("out");
+                @this.unselectAllDefectOut();
             }
-        });
+        }
 
-        $('#select-defect-in-line').on('change', function (e) {
-            Livewire.emit("loadingStart");
+        // $('#defect-out-select-all').on('change', function (e) {
+        //     if (this.checked) {
+        //         Livewire.emit("loadingStart");
 
-            let selectedDefectInLine = $('#select-defect-in-line').val();
+        //         @this.selectAllDefectOut("out");
+        //     } else {
+        //         Livewire.emit("loadingStart");
 
-            @this.set('defectInLine', selectedDefectInLine);
-
-            getMasterPlanData();
-
-            getDefectType();
-            getDefectArea();
-        });
-
-        $('#select-defect-out-line').on('change', function (e) {
-            Livewire.emit("loadingStart");
-
-            let selectedDefectOutLine = $('#select-defect-out-line').val();
-
-            @this.set('defectOutLine', selectedDefectOutLine);
-
-            getMasterPlanData("out");
-
-            getDefectType("out");
-            getDefectArea("out");
-        });
-
-        $('#select-defect-in-master-plan').on('change', function (e) {
-            Livewire.emit("loadingStart");
-
-            let selectedDefectInMasterPlan = $('#select-defect-in-master-plan').val();
-
-            @this.set('defectInSelectedMasterPlan', selectedDefectInMasterPlan);
-
-            getSizeData();
-
-            getDefectType();
-            getDefectArea();
-        });
-
-        $('#select-defect-out-master-plan').on('change', function (e) {
-            Livewire.emit("loadingStart");
-
-            let selectedDefectOutMasterPlan = $('#select-defect-out-master-plan').val();
-
-            @this.set('defectOutSelectedMasterPlan', selectedDefectOutMasterPlan);
-
-            getSizeData("out");
-
-            getDefectType("out");
-            getDefectArea("out");
-        });
-
-        $('#select-defect-in-size').on('change', function (e) {
-            Livewire.emit("loadingStart");
-
-            let selectedDefectInSize = $('#select-defect-in-size').val();
-
-            @this.set('defectInSelectedSize', selectedDefectInSize);
-
-            getDefectType();
-            getDefectArea();
-        });
-
-        $('#select-defect-out-size').on('change', function (e) {
-            Livewire.emit("loadingStart");
-
-            let selectedDefectOutSize = $('#select-defect-out-size').val();
-
-            @this.set('defectOutSelectedSize', selectedDefectOutSize);
-
-            getDefectType("out");
-            getDefectArea("out");
-        });
-
-        $('#select-defect-in-type').on('change', function (e) {
-            Livewire.emit("loadingStart");
-
-            let selectedDefectInType = $('#select-defect-in-type').val();
-
-            @this.set('defectInSelectedType', selectedDefectInType);
-
-            getDefectArea();
-        });
-
-        $('#select-defect-out-type').on('change', function (e) {
-            Livewire.emit("loadingStart");
-
-            let selectedDefectOutType = $('#select-defect-out-type').val();
-
-            @this.set('defectOutSelectedType', selectedDefectOutType);
-
-            getDefectArea("out");
-        });
-
-        $('#select-defect-in-area').on('change', function (e) {
-            Livewire.emit("loadingStart");
-
-            let selectedDefectInType = $('#select-defect-in-area').val();
-
-            @this.set('defectInSelectedArea', selectedDefectInType);
-
-            getDefectType();
-        });
-
-        $('#select-defect-out-area').on('change', function (e) {
-            Livewire.emit("loadingStart");
-
-            let selectedDefectOutType = $('#select-defect-out-area').val();
-
-            @this.set('defectOutSelectedArea', selectedDefectOutType);
-
-            getDefectType("out");
-        });
+        //         @this.unselectAllDefectOut("out");
+        //     }
+        // });
 
         function defectInCheck(element) {
             Livewire.emit("loadingStart");
