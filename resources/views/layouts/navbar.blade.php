@@ -11,7 +11,7 @@
         <div class="container-fluid">
             <div class="d-flex align-items-center">
                 <a class="navbar-brand" href="{{ url('/') }}"><img src="{{ asset('images/Frame 1.png') }}" alt="" width="130"></a>
-                <p class="mb-0 bg-defect p-1 text-light rounded-3 fw-bold">DEFECT LINE</p>
+                <p class="mb-0 bg-defect p-1 text-light rounded-3 fw-bold">DEFECT IN-OUT</p>
             </div>
             <ul class="navbar-nav align-items-center gap-3">
                 <div class="row justify-content-end align-items-center">
@@ -38,8 +38,8 @@
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#profile"><i class="fa-regular fa-gear"></i> {{ strtoupper(Auth::user()->FullName) }}</a></li>
-                                <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#history"><i class="fa-regular fa-clock-rotate-left"></i> Latest Output</a></li>
-                                <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#undo"><i class="fa-regular fa-trash"></i> Latest Undo</a></li>
+                                <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#history"><i class="fa-regular fa-clock-rotate-left"></i> History</a></li>
+                                {{-- <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#undo"><i class="fa-regular fa-trash"></i> Latest Undo</a></li> --}}
                                 <li><a class="dropdown-item" onclick="logout('{{ url('/login/unauthenticate') }}')"><i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out</a></li>
                             </ul>
                         </li>

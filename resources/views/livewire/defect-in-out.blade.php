@@ -1,5 +1,5 @@
 <div>
-    <div class="loading-container-fullscreen hidden" wire:loading wire:target="preSaveSelectedDefectIn, saveSelectedDefectIn, saveCheckedDefectIn, saveAllDefectIn preSaveSelectedDefectOut, saveDelectedDefectOut, saveCheckedDefectOut, saveAllDefectOut">
+    <div class="loading-container-fullscreen" wire:loading wire:target="preSaveSelectedDefectIn, saveSelectedDefectIn, saveCheckedDefectIn, saveAllDefectIn, preSaveSelectedDefectOut, saveSelectedDefectOut, saveCheckedDefectOut, saveAllDefectOut">
         <div class="loading-container">
             <div class="loading"></div>
         </div>

@@ -19,163 +19,44 @@
             <div class="loading mx-auto"></div>
         </div>
         <div class="row" id="content-history" wire:loading.remove wire:target="dateFrom, dateTo">
-            {{-- <div class="col-md-12 table-responsive">
-                <table class="table table-bordered w-100 mx-auto">
-                    <thead>
-                        <tr>
-                            <th class="text-end">Tanggal & Waktu</th>
-                            <th class="text-start">Tipe</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @for ($i = 0; $i < count($latestOutput); $i++)
-                            <tr>
-                                <td class="text-end">{{ $latestOutput[$i]->updated_at }}</td>
-                                <td class="text-start"> - </td>
-                            </tr>
-                        @endfor
-                    </tbody>
-                </table>
-            </div> --}}
-            <div class="col-md-6 table-responsive">
-                <p class="text-rft fw-bold mb-1"> RFT </p>
+            <div class="col-md-12 table-responsive">
+                <div class="mb-3">
+                    <input type="text" class="form-control form-control-sm" placeholder="Search..." wire:model="defectInOutSearch">
+                </div>
                 <table class="table table-bordered w-100 mx-auto">
                     <thead>
                         <tr>
                             <th>Tanggal & Waktu</th>
-                            <th>Ukuran</th>
+                            <th>Line</th>
+                            <th>Master Plan</th>
+                            <th>Size</th>
+                            <th>Type</th>
                             <th>Qty</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @if (count($latestRfts) < 1)
+                        @if (count($latestDefectInOut) < 1)
                             <tr>
-                                <td colspan="3" class="text-center">Data tidak ditemukan</td>
+                                <td colspan="7" class="text-center">Data tidak ditemukan</td>
                             </tr>
                         @else
-                            @foreach ($latestRfts as $latestRft)
+                            @foreach ($latestDefectInOut as $latestDefect)
                                 <tr>
-                                    <td>{{ $latestRft->updated_at }}</td>
-                                    <td>{{ $latestRft->size }}</td>
-                                    <td>{{ $latestRft->total }}</td>
-                                </tr>
-                            @endforeach
-                        @endif
-                    </tbody>
-                </table>
-            </div>
-            <div class="col-md-6 table-responsive">
-                <p class="text-reject fw-bold mb-1"> REJECT </p>
-                <table class="table table-bordered w-100 mx-auto">
-                    <thead>
-                        <tr>
-                            <th>Tanggal & Waktu</th>
-                            <th>Ukuran</th>
-                            <th>Qty</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (count($latestRejects) < 1)
-                            <tr>
-                                <td colspan="3" class="text-center">Data tidak ditemukan</td>
-                            </tr>
-                        @else
-                            @foreach ($latestRejects as $latestReject)
-                                <tr>
-                                    <td>{{ $latestReject->updated_at }}</td>
-                                    <td>{{ $latestReject->size }}</td>
-                                    <td>{{ $latestReject->total }}</td>
-                                </tr>
-                            @endforeach
-                        @endif
-                    </tbody>
-                </table>
-            </div>
-            <div class="col-md-6 table-responsive">
-                <p class="text-defect fw-bold mb-1"> DEFECT </p>
-                <table class="table table-bordered w-100 mx-auto">
-                    <thead>
-                        <tr>
-                            <th>Tanggal & Waktu</th>
-                            <th>Ukuran</th>
-                            <th>Defect Type</th>
-                            <th>Defect Area</th>
-                            @if ($masterPlan)
-                                <th>Defect Image</th>
-                            @endif
-                            <th>Qty</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (count($latestDefects) < 1)
-                            <tr>
-                                <td colspan="6" class="text-center">Data tidak ditemukan</td>
-                            </tr>
-                        @else
-                            @foreach ($latestDefects as $latestDefect)
-                                <tr>
-                                    <td>{{ $latestDefect->updated_at }}</td>
+                                    <td>{{ $latestDefect->time }}</td>
+                                    <td>{{ $latestDefect->sewing_line }}</td>
+                                    <td>{{ $latestDefect->ws." - ".$latestDefect->style." - ".$latestDefect->color }}</td>
                                     <td>{{ $latestDefect->size }}</td>
                                     <td>{{ $latestDefect->defect_type }}</td>
-                                    <td>{{ $latestDefect->defect_area }}</td>
-                                    @if ($masterPlan)
-                                        <td>
-                                            <button type="button" class="btn btn-dark" wire:click="$emit('showDefectAreaImage', '{{$latestDefect->gambar}}', {{$latestDefect->defect_area_x}}, {{$latestDefect->defect_area_y}})'">
-                                                <i class="fa-regular fa-image"></i>
-                                            </button>
-                                        </td>
-                                    @endif
-                                    <td>{{ $latestDefect->total }}</td>
+                                    <td>{{ $latestDefect->qty }}</td>
+                                    <td class="fw-bold {{ $latestDefect->status == "defect" ? "text-defect" : "text-rework" }}">{{ strtoupper($latestDefect->status) }}</td>
                                 </tr>
                             @endforeach
                         @endif
                     </tbody>
                 </table>
+                {{ $latestDefectInOut->links() }}
             </div>
-            <div class="col-md-6 table-responsive">
-                <p class="text-rework fw-bold mb-1"> REWORK </p>
-                <table class="table table-bordered w-100 mx-auto">
-                    <thead>
-                        <tr>
-                            <th>Tanggal & Waktu</th>
-                            <th>Ukuran</th>
-                            <th>Defect Type</th>
-                            <th>Defect Area</th>
-                            @if ($masterPlan)
-                                <th>Defect Image</th>
-                            @endif
-                            <th>Qty</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (count($latestReworks) < 1)
-                            <tr>
-                                <td colspan="6" class="text-center">Data tidak ditemukan</td>
-                            </tr>
-                        @else
-                            @foreach ($latestReworks as $latestRework)
-                                <tr>
-                                    <td>{{ $latestRework->updated_at }}</td>
-                                    <td>{{ $latestRework->size }}</td>
-                                    <td>{{ $latestRework->defect_type }}</td>
-                                    <td>{{ $latestRework->defect_area }}</td>
-                                    @if ($masterPlan)
-                                        <td>
-                                            <button type="button" class="btn btn-dark" wire:click="$emit('showDefectAreaImage', '{{$latestRework->gambar}}', {{$latestRework->defect_area_x}}, {{$latestRework->defect_area_y}})'">
-                                                <i class="fa-regular fa-image"></i>
-                                            </button>
-                                        </td>
-                                    @endif
-                                    <td>{{ $latestRework->total }}</td>
-                                </tr>
-                            @endforeach
-                        @endif
-                    </tbody>
-                </table>
-            </div>
-            {{-- <div class="col-md-8">
-                <div id="daily-chart"></div>
-            </div> --}}
         </div>
     </div>
 </div>
