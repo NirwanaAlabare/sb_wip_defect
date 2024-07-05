@@ -22,13 +22,13 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-3">
+                        <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Tanggal</label>
                                 <input type="date" class="form-select" wire:model="defectInDate" id="defect-in-date">
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-6">
                             <div class="mb-3" wire:ignore>
                                 <label class="form-label fw-bold">Line</label>
                                 <select class="form-select select2" id="select-defect-in-line">
@@ -39,7 +39,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 d-none">
                             <div class="mb-3" wire:ignore>
                                 <label class="form-label fw-bold">Master Plan</label>
                                 <select class="form-select select2" id="select-defect-in-master-plan">
@@ -47,7 +47,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-3 d-none">
                             <div class="mb-3" wire:ignore>
                                 <label class="form-label fw-bold">Size</label>
                                 <select class="form-select select2" id="select-defect-in-size">
@@ -55,7 +55,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-3 d-none">
                             <div class="mb-3" wire:ignore>
                                 <label class="form-label fw-bold">Defect Type</label>
                                 <select class="form-select select2" id="select-defect-in-type">
@@ -63,7 +63,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-3 d-none">
                             <div class="mb-3" wire:ignore>
                                 <label class="form-label fw-bold">Defect Area</label>
                                 <select class="form-select select2" id="select-defect-in-area">
@@ -71,7 +71,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-3 d-none">
                             <div class="row align-items-end">
                                 <div class="col-md-6">
                                     <div class="mb-3">
@@ -90,10 +90,10 @@
                     <div class="row g-3 mt-3">
                         <div class="table-responsive-md">
                             <div class="row">
-                                <div class="col-md-9">
+                                <div class="col-md-12">
                                     <input type="text" class="form-control form-control-sm my-3" wire:model="defectInSearch" placeholder="Search...">
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-3 d-none">
                                     <button type="button" class="btn btn-sm btn-defect w-100 my-3 fw-bold" wire:click="saveAllDefectIn">ALL DEFECT IN</button>
                                 </div>
                             </div>
@@ -214,13 +214,13 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-3">
+                        <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Tanggal</label>
                                 <input type="date" class="form-select" wire:model="defectOutDate" id="defect-out-date">
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-6">
                             <div class="mb-3" wire:ignore>
                                 <label class="form-label fw-bold">Line</label>
                                 <select class="form-select select2" id="select-defect-out-line">
@@ -231,7 +231,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 d-none">
                             <div class="mb-3" wire:ignore>
                                 <label class="form-label fw-bold">Master Plan</label>
                                 <select class="form-select select2" id="select-defect-out-master-plan">
@@ -239,7 +239,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-3 d-none">
                             <div class="mb-3" wire:ignore>
                                 <label class="form-label fw-bold">Size</label>
                                 <select class="form-select select2" id="select-defect-out-size">
@@ -247,7 +247,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-3 d-none">
                             <div class="mb-3" wire:ignore>
                                 <label class="form-label fw-bold">Defect Type</label>
                                 <select class="form-select select2" id="select-defect-out-type">
@@ -255,7 +255,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-3 d-none">
                             <div class="mb-3" wire:ignore>
                                 <label class="form-label fw-bold">Defect Area</label>
                                 <select class="form-select select2" id="select-defect-out-area">
@@ -265,13 +265,13 @@
                         </div>
                         <div class="col-md-3">
                             <div class="row align-items-end">
-                                <div class="col-md-6">
+                                <div class="col-md-6 d-none">
                                     <div class="mb-3">
                                         <label class="form-label fw-bold">Qty</label>
                                         <input type="number" class="form-control" id="defect-out-qty" wire:model="defectOutQty">
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-6 d-none">
                                     <div class="mb-3">
                                         <button type="button" class="btn btn-rework w-100 fw-bold" wire:click="saveFilteredDefectOut">DEFECT OUT</button>
                                     </div>
@@ -282,10 +282,10 @@
                     <div class="row g-3 mt-3">
                         <div class="table-responsive-md">
                             <div class="row">
-                                <div class="col-md-9">
+                                <div class="col-md-12">
                                     <input type="text" class="form-control form-control-sm my-3" wire:model="defectOutSearch" placeholder="Search...">
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-3 d-none">
                                     <button type="button" class="btn btn-sm btn-rework w-100 my-3 fw-bold" wire:click="saveAllDefectOut">ALL DEFECT OUT</button>
                                 </div>
                             </div>
