@@ -18,7 +18,7 @@
         <div class="col-12 col-md-12 {{ $mode != "in" ? 'd-none' : ''}}">
             <div class="card">
                 <div class="card-header bg-defect">
-                    <h5 class="card-title text-light text-center fw-bold">DEFECT IN</h5>
+                    <h5 class="card-title text-light text-center fw-bold">{{ Auth::user()->Groupp." " }}DEFECT IN</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -210,7 +210,7 @@
         <div class="col-12 col-md-12 {{ $mode != "out" ? 'd-none' : ''}}">
             <div class="card">
                 <div class="card-header bg-rework">
-                    <h5 class="card-title text-light text-center fw-bold">DEFECT OUT</h5>
+                    <h5 class="card-title text-light text-center fw-bold">{{ Auth::user()->Groupp." " }}DEFECT OUT</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">

@@ -151,6 +151,7 @@ class DefectInOutController extends Controller
             leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects.defect_type_id")->
             whereRaw("
                 output_defects.defect_status = 'defect'
+                and output_defect_types.allocation = '".Auth::user()->Groupp."'
                 ".$additionalQuery."
             ")->
             whereRaw("so_det.color = master_plan.color")->
@@ -186,9 +187,11 @@ class DefectInOutController extends Controller
             ")->
             leftJoin("so_det", "so_det.id", "=", "output_defects.so_det_id")->
             leftJoin("master_plan", "master_plan.id", "=", "output_defects.master_plan_id")->
+            leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects.defect_type_id")->
             leftJoin("output_defect_areas", "output_defect_areas.id", "=", "output_defects.defect_area_id")->
             whereRaw("
                 output_defects.defect_status = 'defect'
+                and output_defect_types.allocation = '".Auth::user()->Groupp."'
                 ".$additionalQuery."
             ")->
             whereRaw("so_det.color = master_plan.color")->
