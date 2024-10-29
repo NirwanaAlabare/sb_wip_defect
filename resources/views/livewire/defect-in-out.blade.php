@@ -1,5 +1,5 @@
 <div>
-    <div class="loading-container-fullscreen" wire:loading wire:target="changeMode, preSaveSelectedDefectIn, saveSelectedDefectIn, saveCheckedDefectIn, saveAllDefectIn, preSaveSelectedDefectOut, saveSelectedDefectOut, saveCheckedDefectOut, saveAllDefectOut">
+    <div class="loading-container-fullscreen" wire:loading wire:target="changeMode, preSaveSelectedDefectIn, saveSelectedDefectIn, saveCheckedDefectIn, saveAllDefectIn, preSaveSelectedDefectOut, saveSelectedDefectOut, saveCheckedDefectOut, saveAllDefectOut, refreshComponent">
         <div class="loading-container">
             <div class="loading"></div>
         </div>
@@ -14,11 +14,17 @@
             <button type="button" class="btn btn-sm btn-defect {{ $mode == "in" ? "active" : "" }}" {{ $mode == "in" ? "disabled" : "" }} wire:click="changeMode('in')">IN</button>
             <button type="button" class="btn btn-sm btn-rework {{ $mode == "out" ? "active" : "" }}" {{ $mode == "out" ? "disabled" : "" }} wire:click="changeMode('out')">OUT</button>
         </div>
+
         {{-- Defect IN --}}
-        <div class="col-12 col-md-12 {{ $mode != "in" ? 'd-none' : ''}}">
+        <div class="col-12 col-md-12 {{ $mode != "in" ? 'd-none' : ''}}" wire:poll.30000ms>
             <div class="card">
                 <div class="card-header bg-defect">
-                    <h5 class="card-title text-light text-center fw-bold">{{ Auth::user()->Groupp." " }}DEFECT IN</h5>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title text-light text-center fw-bold">{{ Auth::user()->Groupp." " }}DEFECT IN</h5>
+                        <button class="btn btn-dark float-end" wire:click="refreshComponent()">
+                            <i class="fa-solid fa-rotate"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -207,10 +213,15 @@
         </div>
 
         {{-- Defect OUT --}}
-        <div class="col-12 col-md-12 {{ $mode != "out" ? 'd-none' : ''}}">
+        <div class="col-12 col-md-12 {{ $mode != "out" ? 'd-none' : ''}}" wire:poll.30000ms>
             <div class="card">
                 <div class="card-header bg-rework">
-                    <h5 class="card-title text-light text-center fw-bold">{{ Auth::user()->Groupp." " }}DEFECT OUT</h5>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title text-light text-center fw-bold">{{ Auth::user()->Groupp." " }}DEFECT OUT</h5>
+                        <button class="btn btn-dark float-end" wire:click="refreshComponent()">
+                            <i class="fa-solid fa-rotate"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="row">

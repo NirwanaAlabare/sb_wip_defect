@@ -138,6 +138,7 @@ class DefectInOut extends Component
         leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects.defect_type_id")->
         leftJoin("output_defect_in_out", "output_defect_in_out.defect_id", "=", "output_defects.id")->
         where("output_defects.defect_status", "defect")->
+        where("output_defect_types.allocation", Auth::user()->Groupp)->
         whereNull("output_defect_in_out.id");
         if ($this->defectInSearch) {
             $defectInQuery->whereRaw("(
@@ -297,6 +298,10 @@ class DefectInOut extends Component
         DefectInOutModel::insert($defectInArr);
 
         if (count($defectInArr) > 0) {
+            $this->defectInSelectedList = [];
+
+            $this->defectInListAllChecked = false;
+
             $this->emit('alert', 'success', count($defectInArr)." DEFECT berhasil di masuk '".Auth::user()->Groupp."'");
         } else {
             $this->emit('alert', 'warning', "DEFECT gagal masuk '".Auth::user()->Groupp."'");
@@ -354,6 +359,10 @@ class DefectInOut extends Component
         ]);
 
         if (count($defectInIds) > 0) {
+            $this->defectOutSelectedList = [];
+
+            $this->defectOutListAllChecked = false;
+
             $this->emit('alert', 'success', count($defectInIds)." DEFECT berhasil keluar dari '".Auth::user()->Groupp."'");
         } else {
             $this->emit('alert', 'warning', "DEFECT gagal keluar '".Auth::user()->Groupp."'");
@@ -688,7 +697,7 @@ class DefectInOut extends Component
             $defectInQuery->where("output_defects.defect_type_id", $this->defectInTypeModal);
         }
 
-        if ($this->defectInQtyModal > 0) {
+        if ($this->defectInQtyModal > 0 && $this->defectInQtyModal <= $defectInQuery->count()) {
             $defectIn = $defectInQuery->
                 orderBy("master_plan.sewing_line")->
                 orderBy("master_plan.id_ws")->
@@ -709,7 +718,7 @@ class DefectInOut extends Component
                 $this->emit('alert', 'warning', "DEFECT gagal masuk ke '".Auth::user()->Groupp."'");
             }
         } else {
-            $this->emit('alert', 'warning', "Qty DEFECT IN 0");
+            $this->emit('alert', 'error', "Qty DEFECT IN tidak valid (<b>MIN:1</b> | <b>MAX:".$defectInQuery->count()."</b>)");
         }
     }
 
@@ -936,5 +945,10 @@ class DefectInOut extends Component
             paginate(10, ['*'], 'defectOutPage');
 
         return view('livewire.defect-in-out', ["defectInList" => $defectInList, "defectOutList" => $defectOutList]);
+    }
+
+    public function refreshComponent()
+    {
+        $this->emit('$refresh');
     }
 }
