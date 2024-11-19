@@ -18,6 +18,8 @@ class DefectInOut extends Component
 
     protected $paginationTheme = 'bootstrap';
 
+    public $date;
+
     public $lines;
     public $orders;
 
@@ -59,6 +61,10 @@ class DefectInOut extends Component
     public $defectOutSelectedArea;
 
     public $defectInOutSearch;
+
+    public $productTypeImage;
+    public $defectPositionX;
+    public $defectPositionY;
 
     public $mode;
 
