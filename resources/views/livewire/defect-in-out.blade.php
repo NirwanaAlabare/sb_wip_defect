@@ -11,6 +11,7 @@
     </div>
     <div class="row g-3">
         <div class="d-flex justify-content-center gap-1">
+            <button type="button" class="btn btn-sm btn-sb-outline {{ $mode == "in-out" ? "active" : "" }}" {{ $mode == "in-out" ? "disabled" : "" }} wire:click="changeMode('in-out')">SUM</button>
             <button type="button" class="btn btn-sm btn-defect {{ $mode == "in" ? "active" : "" }}" {{ $mode == "in" ? "disabled" : "" }} wire:click="changeMode('in')">IN</button>
             <button type="button" class="btn btn-sm btn-rework {{ $mode == "out" ? "active" : "" }}" {{ $mode == "out" ? "disabled" : "" }} wire:click="changeMode('out')">OUT</button>
         </div>
@@ -405,6 +406,97 @@
                         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Batal</button>
                         <button type="button" class="btn btn-rework fw-bold" wire:click="saveSelectedDefectOut">DEFECT OUT</button>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- All Defect --}}
+        <div class="col-12 col-md-12 {{ $mode != "in-out" ? 'd-none' : ''}}" wire:poll.30000ms>
+            <div class="card">
+                <div class="card-header bg-sb">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title text-light text-center fw-bold">{{ Auth::user()->Groupp." " }}Defect In Out Summary</h5>
+                        <div class="d-flex align-items-center">
+                            <h5 class="px-3 mb-0 text-light">Total : <b>{{ $totalDefectInOut }}</b></h5>
+                            <button class="btn btn-dark float-end" wire:click="refreshComponent()">
+                                <i class="fa-solid fa-rotate"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <input type="text" class="form-control form-control-sm my-3" wire:model="defectInOutSearch" placeholder="Search...">
+                        </div>
+                        <div class="col-md-3 d-none">
+                            <button type="button" class="btn btn-sm btn-rework w-100 my-3 fw-bold" wire:click="saveAllDefectIn">ALL DEFECT OUT</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered w-100">
+                            <thead>
+                                <tr class="text-center align-middle">
+                                    <th>No.</th>
+                                    <th>Date IN</th>
+                                    <th>Time IN</th>
+                                    <th>Date OUT</th>
+                                    <th>Time OUT</th>
+                                    <th>Line</th>
+                                    <th>QR</th>
+                                    <th>No. WS</th>
+                                    <th>Style</th>
+                                    <th>Color</th>
+                                    <th>Size</th>
+                                    <th>Type</th>
+                                    <th>Area</th>
+                                    <th>Image</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if ($defectInOutList->count() < 1)
+                                    <tr class="text-center align-middle">
+                                        <td colspan="15" class="text-center">Data tidak ditemukan</td>
+                                    </tr>
+                                @else
+                                    @foreach ($defectInOutList as $defectInOut)
+                                        <tr class="text-center align-middle">
+                                            <td class="text-nowrap">{{ $defectInOutList->firstItem() + $loop->index }}</td>
+                                            <td class="text-nowrap">{{ $defectInOut->date_in }}</td>
+                                            <td class="text-nowrap">{{ $defectInOut->time_in }}</td>
+                                            <td class="text-nowrap">{{ $defectInOut->date_out }}</td>
+                                            <td class="text-nowrap">{{ $defectInOut->time_out }}</td>
+                                            <td class="text-nowrap">{{ strtoupper(str_replace("_", " ", $defectInOut->sewing_line)) }}</td>
+                                            <td class="text-nowrap">{{ $defectInOut->kode_numbering }}</td>
+                                            <td class="text-nowrap">{{ $defectInOut->ws }}</td>
+                                            <td class="text-nowrap">{{ $defectInOut->style }}</td>
+                                            <td class="text-nowrap">{{ $defectInOut->color }}</td>
+                                            <td class="text-nowrap">{{ $defectInOut->size }}</td>
+                                            <td class="text-nowrap">{{ $defectInOut->defect_type }}</td>
+                                            <td class="text-nowrap">{{ $defectInOut->defect_area }}</td>
+                                            <td class="text-nowrap"><button class="btn btn-dark" wire:click="showDefectAreaImage('{{$defectInOut->gambar}}', {{$defectInOut->defect_area_x}}, {{$defectInOut->defect_area_y}})"><i class="fa fa-image"></i></button></td>
+                                            <td class="text-nowrap">{{ $defectInOut->status == "reworked" ? "DONE" : ($defectInOut->status == "defect" ? "PROCESS" : '-') }}</td>
+                                        </tr>
+                                    @endforeach
+                                @endif
+                            </tbody>
+                        </table>
+                        {{ $defectInOutList->links() }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Show Defect Area --}}
+        <div class="show-defect-area" id="show-defect-area" wire:ignore>
+            <div class="position-relative d-flex flex-column justify-content-center align-items-center">
+                <button type="button" class="btn btn-lg btn-light rounded-0 hide-defect-area-img" onclick="onHideDefectAreaImage()">
+                    <i class="fa-regular fa-xmark fa-lg"></i>
+                </button>
+                <div class="defect-area-img-container mx-auto">
+                    <div class="defect-area-img-point" id="defect-area-img-point-show"></div>
+                    <img src="" alt="" class="img-fluid defect-area-img" id="defect-area-img-show">
                 </div>
             </div>
         </div>

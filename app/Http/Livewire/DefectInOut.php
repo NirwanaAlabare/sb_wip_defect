@@ -58,14 +58,28 @@ class DefectInOut extends Component
     public $defectOutSelectedType;
     public $defectOutSelectedArea;
 
+    public $defectInOutSearch;
+
     public $mode;
 
     public $loadingMasterPlan;
 
     public $baseUrl;
 
+    public $listeners = [
+        'setDate' => 'setDate',
+        'hideDefectAreaImageClear' => 'hideDefectAreaImage'
+    ];
+
+    public function setDate($date)
+    {
+        $this->date = $date;
+    }
+
     public function mount()
     {
+        $this->date = date('Y-m-d');
+
         $this->mode = 'in';
         $this->lines = null;
         $this->orders = null;
@@ -95,6 +109,10 @@ class DefectInOut extends Component
         $this->defectOutSelectedList = [];
         $this->defectOutSearch = null;
         $this->defectOutListAllChecked = false;
+
+        $this->productTypeImage = null;
+        $this->defectPositionX = null;
+        $this->defectPositionY = null;
 
         $this->loadingMasterPlan = false;
         $this->baseUrl = url('/');
@@ -826,6 +844,22 @@ class DefectInOut extends Component
         $this->emit('hideModal', 'defectOut');
     }
 
+    public function showDefectAreaImage($productTypeImage, $x, $y)
+    {
+        $this->productTypeImage = $productTypeImage;
+        $this->defectPositionX = $x;
+        $this->defectPositionY = $y;
+
+        $this->emit('showDefectAreaImage', $this->productTypeImage, $this->defectPositionX, $this->defectPositionY);
+    }
+
+    public function hideDefectAreaImage()
+    {
+        $this->productTypeImage = null;
+        $this->defectPositionX = null;
+        $this->defectPositionY = null;
+    }
+
     public function render()
     {
         $this->loadingMasterPlan = false;
@@ -944,7 +978,60 @@ class DefectInOut extends Component
             orderBy("output_defects.so_det_id")->
             paginate(10, ['*'], 'defectOutPage');
 
-        return view('livewire.defect-in-out', ["defectInList" => $defectInList, "defectOutList" => $defectOutList]);
+        // All Defect
+        $defectInOutQuery = DefectInOutModel::selectRaw("
+                DATE(output_defect_in_out.created_at) date_in,
+                TIME(output_defect_in_out.created_at) time_in,
+                DATE(output_defect_in_out.reworked_at) date_out,
+                TIME(output_defect_in_out.reworked_at) time_out,
+                master_plan.sewing_line,
+                output_defects.kode_numbering,
+                act_costing.kpno as ws,
+                act_costing.styleno as style,
+                master_plan.color as color,
+                so_det.size,
+                output_defects.defect_type_id,
+                output_defect_types.defect_type,
+                output_defect_areas.defect_area,
+                output_defect_in_out.status,
+                master_plan.gambar,
+                output_defects.defect_area_x,
+                output_defects.defect_area_y
+            ")->
+            leftJoin("output_defects", "output_defects.id", "=", "output_defect_in_out.defect_id")->
+            leftJoin("so_det", "so_det.id", "=", "output_defects.so_det_id")->
+            leftJoin("master_plan", "master_plan.id", "=", "output_defects.master_plan_id")->
+            leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
+            leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects.defect_type_id")->
+            leftJoin("output_defect_areas", "output_defect_areas.id", "=", "output_defects.defect_area_id")->
+            where("output_defect_types.allocation", Auth::user()->Groupp)->
+            where("output_defect_in_out.type", Auth::user()->Groupp)->
+            whereBetween("output_defects.updated_at", [$this->date." 00:00:00", $this->date." 23:59:59"]);
+
+            if ($this->defectInOutSearch) {
+                $defectInOutQuery->whereRaw("(
+                    master_plan.tgl_plan LIKE '%".$this->defectInOutSearch."%' OR
+                    master_plan.sewing_line LIKE '%".$this->defectInOutSearch."%' OR
+                    act_costing.kpno LIKE '%".$this->defectInOutSearch."%' OR
+                    act_costing.styleno LIKE '%".$this->defectInOutSearch."%' OR
+                    master_plan.color LIKE '%".$this->defectInOutSearch."%' OR
+                    output_defects.kode_numbering LIKE '%".$this->defectInSearch."%' OR
+                    output_defect_types.defect_type LIKE '%".$this->defectInOutSearch."%' OR
+                    output_defect_in_out.updated_at LIKE '%".$this->defectInOutSearch."%' OR
+                    so_det.size LIKE '%".$this->defectInOutSearch."%'
+                )");
+            }
+
+            $defectInOutList = $defectInOutQuery->
+                groupBy("output_defect_in_out.id")->
+                orderBy("master_plan.sewing_line")->
+                orderBy("master_plan.id_ws")->
+                orderBy("master_plan.color")->
+                orderBy("output_defect_types.defect_type")->
+                orderBy("output_defects.so_det_id")->
+                paginate(10, ['*'], 'defectInOutPage');
+
+        return view('livewire.defect-in-out', ["defectInList" => $defectInList, "defectOutList" => $defectOutList, "defectInOutList" => $defectInOutList, "totalDefectInOut" => $defectInOutList->count()]);
     }
 
     public function refreshComponent()
