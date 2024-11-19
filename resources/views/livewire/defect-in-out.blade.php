@@ -842,5 +842,39 @@
                 element.removeAttribute("checked");
             }
         }
+
+        function onShowDefectAreaImage(defectAreaImage, x, y) {
+            Livewire.emit('showDefectAreaImage', defectAreaImage, x, y);
+        }
+
+        Livewire.on('showDefectAreaImage', async function (defectAreaImage, x, y) {
+            await showDefectAreaImage(defectAreaImage);
+
+            let defectAreaImageElement = document.getElementById('defect-area-img-show');
+            let defectAreaImagePointElement = document.getElementById('defect-area-img-point-show');
+
+            defectAreaImageElement.style.display = 'block'
+
+            let rect = await defectAreaImageElement.getBoundingClientRect();
+
+            let pointWidth = null;
+            if (rect.width == 0) {
+                pointWidth = 35;
+            } else {
+                pointWidth = 0.03 * rect.width;
+            }
+
+            defectAreaImagePointElement.style.width = pointWidth+'px';
+            defectAreaImagePointElement.style.height = defectAreaImagePointElement.style.width;
+            defectAreaImagePointElement.style.left =  'calc('+x+'% - '+0.5 * pointWidth+'px)';
+            defectAreaImagePointElement.style.top =  'calc('+y+'% - '+0.5 * pointWidth+'px)';
+            defectAreaImagePointElement.style.display = 'block';
+        });
+
+        function onHideDefectAreaImage() {
+            hideDefectAreaImage();
+
+            Livewire.emit('hideDefectAreaImageClear');
+        }
     </script>
 @endpush
