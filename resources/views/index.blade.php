@@ -20,6 +20,12 @@
             }
         });
 
+        Livewire.on('loadingEnd', () => {
+            if (document.getElementById('loading-defect-in-out')) {
+                $('#loading-defect-in-out').addClass('hidden');
+            }
+        });
+
         Livewire.on('alert', (type, message) => {
             showNotification(type, message);
         });

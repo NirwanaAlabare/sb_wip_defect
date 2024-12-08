@@ -29,13 +29,13 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Tanggal</label>
                                 <input type="date" class="form-select" wire:model="defectInDate" id="defect-in-date">
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="mb-3" wire:ignore>
                                 <label class="form-label fw-bold">Line</label>
                                 <select class="form-select select2" id="select-defect-in-line">
@@ -43,6 +43,15 @@
                                     @foreach ($lines as $line)
                                         <option value="{{ $line->username }}">{{ $line->username }}</option>
                                     @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3" wire:ignore>
+                                <label class="form-label fw-bold">Output</label>
+                                <select class="form-select" id="select-defect-in-output" wire:model="defectInOutputType">
+                                    <option value="qc">QC</option>
+                                    <option value="packing">PACKING</option>
                                 </select>
                             </div>
                         </div>
@@ -113,6 +122,7 @@
                                         <th>Size</th>
                                         <th>Type</th>
                                         <th>Qty</th>
+                                        <th>Output</th>
                                         <th><input class="form-check-input" type="checkbox" value="" id="defect-in-select-all" onclick="defectInSelectAll(this)" style="scale: 1.3"></th>
                                         <th>IN</th>
                                     </tr>
@@ -120,7 +130,7 @@
                                 <tbody>
                                     @if (count($defectInList) < 1)
                                         <tr class="text-center align-middle">
-                                            <td colspan="8" class="text-center">Data tidak ditemukan</td>
+                                            <td colspan="9" class="text-center">Data tidak ditemukan</td>
                                         </tr>
                                     @else
                                         @foreach ($defectInList as $defectIn)
@@ -129,7 +139,7 @@
 
                                                 if ($defectInSelectedList) {
                                                     $thisDefectInChecked = $defectInSelectedList->filter(function ($item) use ($defectIn) {
-                                                        return $item['master_plan_id'] == $defectIn->master_plan_id && $item['defect_type_id'] == $defectIn->defect_type_id && $item['so_det_id'] == $defectIn->so_det_id;
+                                                        return $item['master_plan_id'] == $defectIn->master_plan_id && $item['defect_type_id'] == $defectIn->defect_type_id && $item['so_det_id'] == $defectIn->so_det_id && $item['output_type'] == $defectIn->output_type;
                                                     });
                                                 }
                                             @endphp
@@ -140,8 +150,9 @@
                                                 <td>{{ $defectIn->size }}</td>
                                                 <td>{{ $defectIn->defect_type }}</td>
                                                 <td>{{ $defectIn->defect_qty }}</td>
-                                                <td><input class="form-check-input" type="checkbox" value="{{ $defectIn->master_plan_id.'-'.$defectIn->defect_type_id.'-'.$defectIn->so_det_id }}" style="scale: 1.3" {{ $thisDefectInChecked && $thisDefectInChecked->count() > 0 ? "checked" : ""  }} onchange="defectInCheck(this)"></td>
-                                                <td><button class="btn btn-sm btn-defect fw-bold" wire:click='preSaveSelectedDefectIn("{{ $defectIn->master_plan_id.'-'.$defectIn->defect_type_id.'-'.$defectIn->so_det_id }}")'>IN</button></td>
+                                                <td class="fw-bold {{ $defectIn->output_type == 'qc' ? 'text-danger' : 'text-success'  }}">{{ strtoupper($defectIn->output_type) }}</td>
+                                                <td><input class="form-check-input" type="checkbox" value="{{ $defectIn->master_plan_id.'-'.$defectIn->defect_type_id.'-'.$defectIn->so_det_id.'-'.$defectIn->output_type }}" style="scale: 1.3" {{ $thisDefectInChecked && $thisDefectInChecked->count() > 0 ? "checked" : ""  }} onchange="defectInCheck(this)"></td>
+                                                <td><button class="btn btn-sm btn-defect fw-bold" wire:click='preSaveSelectedDefectIn("{{ $defectIn->master_plan_id.'-'.$defectIn->defect_type_id.'-'.$defectIn->so_det_id.'-'.$defectIn->output_type }}")'>IN</button></td>
                                             </tr>
                                         @endforeach
                                     @endif
@@ -175,6 +186,12 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
+                                    <label class="form-label">Output</label>
+                                    <input type="text" class="form-control form-control-sm" wire:model="defectInOutputModal" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
                                     <label class="form-label">Line</label>
                                     <input type="text" class="form-control form-control-sm" wire:model="defectInLineModal" readonly>
                                 </div>
@@ -197,7 +214,7 @@
                                     <input type="text" class="form-control form-control-sm" wire:model="defectInTypeTextModal" readonly>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <div class="mb-3">
                                     <label class="form-label">Qty</label>
                                     <input type="number" class="form-control form-control-sm" wire:model="defectInQtyModal">
@@ -226,13 +243,13 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Tanggal</label>
                                 <input type="date" class="form-select" wire:model="defectOutDate" id="defect-out-date">
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="mb-3" wire:ignore>
                                 <label class="form-label fw-bold">Line</label>
                                 <select class="form-select select2" id="select-defect-out-line">
@@ -240,6 +257,15 @@
                                     @foreach ($lines as $line)
                                         <option value="{{ $line->username }}">{{ $line->username }}</option>
                                     @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3" wire:ignore>
+                                <label class="form-label fw-bold">Output</label>
+                                <select class="form-select" id="select-defect-in-output" wire:model="defectOutOutputType">
+                                    <option value="qc">QC</option>
+                                    <option value="packing">PACKING</option>
                                 </select>
                             </div>
                         </div>
@@ -310,6 +336,7 @@
                                         <th>Size</th>
                                         <th>Type</th>
                                         <th>Qty</th>
+                                        <th>Output</th>
                                         <th><input class="form-check-input" type="checkbox" value="" id="defect-out-select-all" onchange="defectOutSelectAll(this)" style="scale: 1.3"></th>
                                         <th>IN</th>
                                     </tr>
@@ -317,7 +344,7 @@
                                 <tbody>
                                     @if (count($defectOutList) < 1)
                                         <tr class="text-center align-middle">
-                                            <td colspan="8" class="text-center">Data tidak ditemukan</td>
+                                            <td colspan="9" class="text-center">Data tidak ditemukan</td>
                                         </tr>
                                     @else
                                         @foreach ($defectOutList as $defectOut)
@@ -326,19 +353,20 @@
 
                                                 if ($defectOutSelectedList) {
                                                     $thisDefectOutChecked = $defectOutSelectedList->filter(function ($item) use ($defectOut) {
-                                                        return $item['master_plan_id'] == $defectOut->master_plan_id && $item['defect_type_id'] == $defectOut->defect_type_id && $item['so_det_id'] == $defectOut->so_det_id;
+                                                        return $item['master_plan_id'] == $defectOut->master_plan_id && $item['defect_type_id'] == $defectOut->defect_type_id && $item['so_det_id'] == $defectOut->so_det_id && $item['output_type'] == $defectOut->output_type;
                                                     });
                                                 }
                                             @endphp
-                                            <tr class="text-center align-middle" wire:key='defect-out-{{ $defectOut->master_plan_id.'-'.$defectOut->defect_type_id.'-'.$defectOut->so_det_id }}'>
+                                            <tr class="text-center align-middle" wire:key='defect-out-{{ $defectOut->master_plan_id.'-'.$defectOut->defect_type_id.'-'.$defectOut->so_det_id.'-'.$defectOut->output_type }}'>
                                                 <td>{{ $defectOutList->firstItem() + $loop->index }}</td>
                                                 <td>{{ strtoupper(str_replace("_", " ", $defectOut->sewing_line)) }}</td>
                                                 <td>{{ $defectOut->ws }}<br>{{ $defectOut->style }}<br>{{ $defectOut->color }}</td>
                                                 <td>{{ $defectOut->size }}</td>
                                                 <td>{{ $defectOut->defect_type }}</td>
                                                 <td>{{ $defectOut->defect_qty }}</td>
-                                                <td><input class="form-check-input" type="checkbox" value="{{ $defectOut->master_plan_id.'-'.$defectOut->defect_type_id.'-'.$defectOut->so_det_id }}" style="scale: 1.3" {{ $thisDefectOutChecked && $thisDefectOutChecked->count() > 0 ? "checked" : ""  }} onchange="defectOutCheck(this)"></td>
-                                                <td><button class="btn btn-sm btn-rework fw-bold" wire:click="preSaveSelectedDefectOut('{{ $defectOut->master_plan_id.'-'.$defectOut->defect_type_id.'-'.$defectOut->so_det_id }}')">OUT</button></td>
+                                                <td class="fw-bold {{ $defectOut->output_type == "qc" ? "text-danger" : "text-success" }}">{{ strtoupper($defectOut->output_type) }}</td>
+                                                <td><input class="form-check-input" type="checkbox" value="{{ $defectOut->master_plan_id.'-'.$defectOut->defect_type_id.'-'.$defectOut->so_det_id.'-'.$defectOut->so_det_id }}" style="scale: 1.3" {{ $thisDefectOutChecked && $thisDefectOutChecked->count() > 0 ? "checked" : ""  }} onchange="defectOutCheck(this)"></td>
+                                                <td><button class="btn btn-sm btn-rework fw-bold" wire:click="preSaveSelectedDefectOut('{{ $defectOut->master_plan_id.'-'.$defectOut->defect_type_id.'-'.$defectOut->so_det_id.'-'.$defectOut->output_type }}')">OUT</button></td>
                                             </tr>
                                         @endforeach
                                     @endif
@@ -372,6 +400,12 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
+                                    <label class="form-label">Output</label>
+                                    <input type="text" class="form-control form-control-sm" wire:model="defectOutOutputModal" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
                                     <label class="form-label">Line</label>
                                     <input type="text" class="form-control form-control-sm" wire:model="defectOutLineModal" readonly>
                                 </div>
@@ -394,7 +428,7 @@
                                     <input type="text" class="form-control form-control-sm" wire:model="defectOutTypeTextModal" readonly>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <div class="mb-3">
                                     <label class="form-label">Qty</label>
                                     <input type="number" class="form-control form-control-sm" wire:model="defectOutQtyModal">

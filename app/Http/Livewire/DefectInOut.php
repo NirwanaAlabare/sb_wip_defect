@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\SignalBit\UserPassword;
 use App\Models\SignalBit\MasterPlan;
 use App\Models\SignalBit\Defect;
+use App\Models\SignalBit\DefectPacking;
 use App\Models\SignalBit\DefectInOut as DefectInOutModel;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
@@ -25,9 +26,11 @@ class DefectInOut extends Component
 
     public $defectInDate;
     public $defectInLine;
+    public $defectInOutputType;
     public $defectInQty;
 
     public $defectInDateModal;
+    public $defectInOutputModal;
     public $defectInLineModal;
     public $defectInMasterPlanModal;
     public $defectInSizeModal;
@@ -37,9 +40,11 @@ class DefectInOut extends Component
 
     public $defectOutDate;
     public $defectOutLine;
+    public $defectOutOutputType;
     public $defectOutQty;
 
     public $defectOutDateModal;
+    public $defectOutOutputeModal;
     public $defectOutLineModal;
     public $defectOutMasterPlanModal;
     public $defectOutSizeModal;
@@ -62,6 +67,8 @@ class DefectInOut extends Component
 
     public $defectInOutSearch;
 
+    public $defectInOutOutputType;
+
     public $productTypeImage;
     public $defectPositionX;
     public $defectPositionY;
@@ -74,7 +81,8 @@ class DefectInOut extends Component
 
     public $listeners = [
         'setDate' => 'setDate',
-        'hideDefectAreaImageClear' => 'hideDefectAreaImage'
+        'hideDefectAreaImageClear' => 'hideDefectAreaImage',
+        'refreshComponent' => 'refreshComponent'
     ];
 
     public function setDate($date)
@@ -91,6 +99,7 @@ class DefectInOut extends Component
         $this->orders = null;
 
         // Defect In init value
+        $this->defectInOutputType = 'qc';
         $this->defectInDate = date('Y-m-d');
         $this->defectInLine = null;
         $this->defectInMasterPlan = null;
@@ -104,6 +113,7 @@ class DefectInOut extends Component
         $this->defectInListAllChecked = null;
 
         // Defect Out init value
+        $this->defectOutOutputType = 'qc';
         $this->defectOutDate = date('Y-m-d');
         $this->defectOutLine = null;
         $this->defectOutMasterPlan = null;
@@ -151,52 +161,109 @@ class DefectInOut extends Component
 
     public function selectAllDefectIn()
     {
-        $defectInQuery = Defect::selectRaw("
-            master_plan.id master_plan_id,
-            output_defects.defect_type_id,
-            output_defects.so_det_id
-        ")->
-        leftJoin("so_det", "so_det.id", "=", "output_defects.so_det_id")->
-        leftJoin("master_plan", "master_plan.id", "=", "output_defects.master_plan_id")->
-        leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
-        leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects.defect_type_id")->
-        leftJoin("output_defect_in_out", "output_defect_in_out.defect_id", "=", "output_defects.id")->
-        where("output_defects.defect_status", "defect")->
-        where("output_defect_types.allocation", Auth::user()->Groupp)->
-        whereNull("output_defect_in_out.id");
-        if ($this->defectInSearch) {
-            $defectInQuery->whereRaw("(
-                master_plan.tgl_plan LIKE '%".$this->defectInSearch."%' OR
-                master_plan.sewing_line LIKE '%".$this->defectInSearch."%' OR
-                act_costing.kpno LIKE '%".$this->defectInSearch."%' OR
-                act_costing.styleno LIKE '%".$this->defectInSearch."%' OR
-                master_plan.color LIKE '%".$this->defectInSearch."%' OR
-                output_defect_types.defect_type LIKE '%".$this->defectInSearch."%' OR
-                so_det.size LIKE '%".$this->defectInSearch."%'
-            )");
+        if ($this->defectInOutputType == "packing") {
+            $defectInQuery = DefectPacking::selectRaw("
+                master_plan.id master_plan_id,
+                output_defects_packing.defect_type_id,
+                output_defects_packing.so_det_id,
+                'packing' output_type
+            ")->
+            leftJoin("so_det", "so_det.id", "=", "output_defects_packing.so_det_id")->
+            leftJoin("master_plan", "master_plan.id", "=", "output_defects_packing.master_plan_id")->
+            leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
+            leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects_packing.defect_type_id")->
+            leftJoin("output_defect_in_out", function($join) {
+                $join->on("output_defect_in_out.defect_id", "=", "output_defects_packing.id");
+                $join->on("output_defect_in_out.output_type", "=", DB::raw("'packing'"));
+            })->
+            where("output_defects_packing.defect_status", "defect")->
+            where("output_defect_types.allocation", Auth::user()->Groupp)->
+            whereNull("output_defect_in_out.id");
+            if ($this->defectInSearch) {
+                $defectInQuery->whereRaw("(
+                    master_plan.tgl_plan LIKE '%".$this->defectInSearch."%' OR
+                    master_plan.sewing_line LIKE '%".$this->defectInSearch."%' OR
+                    act_costing.kpno LIKE '%".$this->defectInSearch."%' OR
+                    act_costing.styleno LIKE '%".$this->defectInSearch."%' OR
+                    master_plan.color LIKE '%".$this->defectInSearch."%' OR
+                    output_defect_types.defect_type LIKE '%".$this->defectInSearch."%' OR
+                    so_det.size LIKE '%".$this->defectInSearch."%'
+                )");
+            }
+            if ($this->defectInDate) {
+                $defectInQuery->where("master_plan.tgl_plan", $this->defectInDate);
+            }
+            if ($this->defectInLine) {
+                $defectInQuery->where("master_plan.sewing_line", $this->defectInLine);
+            }
+            if ($this->defectInSelectedMasterPlan) {
+                $defectInQuery->where("master_plan.id", $this->defectInSelectedMasterPlan);
+            }
+            if ($this->defectInSelectedSize) {
+                $defectInQuery->where("output_defects_packing.so_det_id", $this->defectInSelectedSize);
+            }
+            if ($this->defectInSelectedType) {
+                $defectInQuery->where("output_defects_packing.defect_type_id", $this->defectInSelectedType);
+            }
+            $defectInQuery->groupBy("master_plan.sewing_line", "master_plan.id", "output_defect_types.id", "output_defects_packing.so_det_id")->
+                orderBy("master_plan.sewing_line")->
+                orderBy("master_plan.id_ws")->
+                orderBy("master_plan.color")->
+                orderBy("output_defect_types.defect_type")->
+                orderBy("output_defects_packing.so_det_id");
+        } else {
+            $defectInQuery = Defect::selectRaw("
+                master_plan.id master_plan_id,
+                output_defects.defect_type_id,
+                output_defects.so_det_id,
+                'qc' output_type
+            ")->
+            leftJoin("so_det", "so_det.id", "=", "output_defects.so_det_id")->
+            leftJoin("master_plan", "master_plan.id", "=", "output_defects.master_plan_id")->
+            leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
+            leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects.defect_type_id")->
+            leftJoin("output_defect_in_out", function($join) {
+                $join->on("output_defect_in_out.defect_id", "=", "output_defects.id");
+                $join->on("output_defect_in_out.output_type", "=", DB::raw("'qc'"));
+            })->
+            where("output_defects.defect_status", "defect")->
+            where("output_defect_types.allocation", Auth::user()->Groupp)->
+            whereNull("output_defect_in_out.id");
+            if ($this->defectInSearch) {
+                $defectInQuery->whereRaw("(
+                    master_plan.tgl_plan LIKE '%".$this->defectInSearch."%' OR
+                    master_plan.sewing_line LIKE '%".$this->defectInSearch."%' OR
+                    act_costing.kpno LIKE '%".$this->defectInSearch."%' OR
+                    act_costing.styleno LIKE '%".$this->defectInSearch."%' OR
+                    master_plan.color LIKE '%".$this->defectInSearch."%' OR
+                    output_defect_types.defect_type LIKE '%".$this->defectInSearch."%' OR
+                    so_det.size LIKE '%".$this->defectInSearch."%'
+                )");
+            }
+            if ($this->defectInDate) {
+                $defectInQuery->where("master_plan.tgl_plan", $this->defectInDate);
+            }
+            if ($this->defectInLine) {
+                $defectInQuery->where("master_plan.sewing_line", $this->defectInLine);
+            }
+            if ($this->defectInSelectedMasterPlan) {
+                $defectInQuery->where("master_plan.id", $this->defectInSelectedMasterPlan);
+            }
+            if ($this->defectInSelectedSize) {
+                $defectInQuery->where("output_defects.so_det_id", $this->defectInSelectedSize);
+            }
+            if ($this->defectInSelectedType) {
+                $defectInQuery->where("output_defects.defect_type_id", $this->defectInSelectedType);
+            }
+            $defectInQuery->groupBy("master_plan.sewing_line", "master_plan.id", "output_defect_types.id", "output_defects.so_det_id")->
+                orderBy("master_plan.sewing_line")->
+                orderBy("master_plan.id_ws")->
+                orderBy("master_plan.color")->
+                orderBy("output_defect_types.defect_type")->
+                orderBy("output_defects.so_det_id");
         }
-        if ($this->defectInDate) {
-            $defectInQuery->where("master_plan.tgl_plan", $this->defectInDate);
-        }
-        if ($this->defectInLine) {
-            $defectInQuery->where("master_plan.sewing_line", $this->defectInLine);
-        }
-        if ($this->defectInSelectedMasterPlan) {
-            $defectInQuery->where("master_plan.id", $this->defectInSelectedMasterPlan);
-        }
-        if ($this->defectInSelectedSize) {
-            $defectInQuery->where("output_defects.so_det_id", $this->defectInSelectedSize);
-        }
-        if ($this->defectInSelectedType) {
-            $defectInQuery->where("output_defects.defect_type_id", $this->defectInSelectedType);
-        }
+
         $this->defectInSelectedList = collect($defectInQuery->
-            groupBy("master_plan.sewing_line", "master_plan.id", "output_defect_types.id", "output_defects.so_det_id")->
-            orderBy("master_plan.sewing_line")->
-            orderBy("master_plan.id_ws")->
-            orderBy("master_plan.color")->
-            orderBy("output_defect_types.defect_type")->
-            orderBy("output_defects.so_det_id")->
             get()->
             toArray()
         );
@@ -209,15 +276,17 @@ class DefectInOut extends Component
         $defectOutQuery = DefectInOutModel::selectRaw("
             master_plan.id master_plan_id,
             output_defects.defect_type_id,
-            output_defects.so_det_id
+            output_defects.so_det_id,
+            output_defect_in_out.output_type
         ")->
-        leftJoin("output_defects", "output_defects.id", "=", "output_defect_in_out.defect_id")->
+        leftJoin("output_defects".($this->defectOutOutputType == 'packing' ? '_packing' : '')." as output_defects", "output_defects.id", "=", "output_defect_in_out.defect_id")->
         leftJoin("so_det", "so_det.id", "=", "output_defects.so_det_id")->
         leftJoin("master_plan", "master_plan.id", "=", "output_defects.master_plan_id")->
         leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
         leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects.defect_type_id")->
         where("output_defect_in_out.status", "defect")->
-        where("output_defect_in_out.type", Auth::user()->Groupp);
+        where("output_defect_in_out.type", Auth::user()->Groupp)->
+        where("output_defect_in_out.output_type", $this->defectOutOutputType);
         if ($this->defectOutSearch) {
             $defectOutQuery->whereRaw("(
                 master_plan.tgl_plan LIKE '%".$this->defectOutSearch."%' OR
@@ -273,38 +342,42 @@ class DefectInOut extends Component
     }
 
     public function addDefectInSelectedList($data) {
-        $thisKey = ["master_plan_id", "defect_type_id", "so_det_id"];
+        $thisKey = ["master_plan_id", "defect_type_id", "so_det_id", "output_type"];
         $thisData = explode("-", $data);
 
         $thisArr = array_combine($thisKey, $thisData);
 
         if (is_array($this->defectInSelectedList)) {
             $this->defectInSelectedList = collect([$thisArr]);
-        } else {{
+        } else {
             $this->defectInSelectedList->push($thisArr);
-        }}
+        }
     }
 
     public function removeDefectInSelectedList($data) {
-        $thisKey = ["master_plan_id", "defect_type_id", "so_det_id"];
+        $thisKey = ["master_plan_id", "defect_type_id", "so_det_id", "output_type"];
         $thisData = explode("-", $data);
 
         $thisArr = array_combine($thisKey, $thisData);
 
-        $key = $this->defectInSelectedList->search(function($item) use($thisArr) {
-            return $item['master_plan_id'] == $thisArr['master_plan_id'] && $item['defect_type_id'] == $thisArr['defect_type_id'] && $item['so_det_id'] == $thisArr['so_det_id'];
-        });
+        if ($this->defectOutSelectedList) {
+            $key = $this->defectInSelectedList->search(function($item) use($thisArr) {
+                return $item['master_plan_id'] == $thisArr['master_plan_id'] && $item['defect_type_id'] == $thisArr['defect_type_id'] && $item['so_det_id'] == $thisArr['so_det_id'] && $item['output_type'] == $thisArr['output_type'];
+            });
 
-        $this->defectInSelectedList->pull($key);
+            $this->defectInSelectedList->pull($key);
+        }
     }
 
     public function saveCheckedDefectIn() {
         $defectInArr = [];
         foreach ($this->defectInSelectedList as $defectIn) {
-            $thisDefects = Defect::selectRaw("
-                    id as defect_id,
+            if ($defectIn['output_type'] == 'packing') {
+                $thisDefects = DefectPacking::selectRaw("
+                    output_defects_packing.id as defect_id,
                     'defect' as status,
                     '".Auth::user()->Groupp."' as type,
+                    'packing' as output_type,
                     '".Auth::user()->username."' as created_by,
                     '".Carbon::now()."' as created_at,
                     '".Carbon::now()."' as updated_at
@@ -315,8 +388,29 @@ class DefectInOut extends Component
                 where("so_det_id", $defectIn['so_det_id'])->
                 get()->
                 toArray();
+            } else {
+                $thisDefects = Defect::selectRaw("
+                    output_defects.id as defect_id,
+                    'defect' as status,
+                    '".Auth::user()->Groupp."' as type,
+                    'qc' as output_type,
+                    '".Auth::user()->username."' as created_by,
+                    '".Carbon::now()."' as created_at,
+                    '".Carbon::now()."' as updated_at
+                ")->
+                where("defect_status", 'defect')->
+                where("master_plan_id", $defectIn['master_plan_id'])->
+                where("defect_type_id", $defectIn['defect_type_id'])->
+                where("so_det_id", $defectIn['so_det_id'])->
+                get()->
+                toArray();
+            }
 
-            array_push($defectInArr, ...$thisDefects);
+            $data = array_map(function ($value) {
+                return (array)$value;
+            }, $thisDefects);
+
+            array_push($defectInArr, ...$data);
         }
 
         DefectInOutModel::insert($defectInArr);
@@ -333,7 +427,7 @@ class DefectInOut extends Component
     }
 
     public function addDefectOutSelectedList($data) {
-        $thisKey = ["master_plan_id", "defect_type_id", "so_det_id"];
+        $thisKey = ["master_plan_id", "defect_type_id", "so_det_id", "output_type"];
         $thisData = explode("-", $data);
 
         $thisArr = array_combine($thisKey, $thisData);
@@ -346,14 +440,16 @@ class DefectInOut extends Component
     }
 
     public function removeDefectOutSelectedList($data) {
-        $thisKey = ["master_plan_id", "defect_type_id", "so_det_id"];
+        $thisKey = ["master_plan_id", "defect_type_id", "so_det_id", "output_type"];
         $thisData = explode("-", $data);
 
         $thisArr = array_combine($thisKey, $thisData);
 
-        $key = $this->defectOutSelectedList->search(function($item) use($thisArr) {
-            return $item['master_plan_id'] == $thisArr['master_plan_id'] && $item['defect_type_id'] == $thisArr['defect_type_id'] && $item['so_det_id'] == $thisArr['so_det_id'];
-        });
+        if (!is_array($this->defectOutSelectedList)) {
+            $key = $this->defectOutSelectedList->search(function($item) use($thisArr) {
+                return $item['master_plan_id'] == $thisArr['master_plan_id'] && $item['defect_type_id'] == $thisArr['defect_type_id'] && $item['so_det_id'] == $thisArr['so_det_id'] && $item['output_type'] == $thisArr['output_type'];
+            });
+        }
 
         $this->defectOutSelectedList->pull($key);
     }
@@ -364,8 +460,9 @@ class DefectInOut extends Component
             $thisDefectIn = DefectInOutModel::selectRaw("
                     output_defect_in_out.id
                 ")->
-                leftJoin("output_defects", "output_defects.id", "=", "output_defect_in_out.defect_id")->
+                leftJoin("output_defects".($this->defectOutOutputType == 'packing' ? '_packing' : '')." as output_defects", "output_defects.id", "=", "output_defect_in_out.defect_id")->
                 where("output_defect_in_out.status", 'defect')->
+                where("output_defect_in_out.output_type", $this->defectOutOutputType)->
                 where("output_defect_in_out.type", Auth::user()->Groupp)->
                 where("output_defect_in_out.created_by", Auth::user()->username)->
                 where("output_defects.master_plan_id", $defectOut['master_plan_id'])->
@@ -394,10 +491,58 @@ class DefectInOut extends Component
     }
 
     public function saveFilteredDefectIn() {
-        $defectInQuery = Defect::selectRaw("
+        if ($this->defectInOutputType == 'packing') {
+            $defectInQuery = DefectPacking::selectRaw("
+                output_defects_packing.id as defect_id,
+                'defect' as status,
+                '".Auth::user()->Groupp."' as type,
+                'packing' as output_type,
+                '".Auth::user()->username."' as created_by,
+                '".Carbon::now()."' as created_at,
+                '".Carbon::now()."' as updated_at
+            ")->
+            leftJoin("so_det", "so_det.id", "=", "output_defects_packing.so_det_id")->
+            leftJoin("master_plan", "master_plan.id", "=", "output_defects_packing.master_plan_id")->
+            leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
+            leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects_packing.defect_type_id")->
+            leftJoin("output_defect_in_out", function($join) {
+                $join->on("output_defect_in_out.defect_id", "=", "output_defects_packing.id");
+                $join->on("output_defect_in_out.output_type", "=", DB::raw("'packing'"));
+            })->
+            where("output_defects_packing.defect_status", "defect")->
+            whereNull("output_defect_in_out.id");
+            if ($this->defectInSearch) {
+                $defectInQuery->whereRaw("(
+                    master_plan.tgl_plan LIKE '%".$this->defectInSearch."%' OR
+                    master_plan.sewing_line LIKE '%".$this->defectInSearch."%' OR
+                    act_costing.kpno LIKE '%".$this->defectInSearch."%' OR
+                    act_costing.styleno LIKE '%".$this->defectInSearch."%' OR
+                    master_plan.color LIKE '%".$this->defectInSearch."%' OR
+                    output_defect_types.defect_type LIKE '%".$this->defectInSearch."%' OR
+                    so_det.size LIKE '%".$this->defectInSearch."%'
+                )");
+            }
+            if ($this->defectInDate) {
+                $defectInQuery->where("master_plan.tgl_plan", $this->defectInDate);
+            }
+            if ($this->defectInLine) {
+                $defectInQuery->where("master_plan.sewing_line", $this->defectInLine);
+            }
+            if ($this->defectInSelectedMasterPlan) {
+                $defectInQuery->where("master_plan.id", $this->defectInSelectedMasterPlan);
+            }
+            if ($this->defectInSelectedSize) {
+                $defectInQuery->where("output_defects_packing.so_det_id", $this->defectInSelectedSize);
+            }
+            if ($this->defectInSelectedType) {
+                $defectInQuery->where("output_defects_packing.defect_type_id", $this->defectInSelectedType);
+            }
+        } else {
+            $defectInQuery = Defect::selectRaw("
                 output_defects.id as defect_id,
                 'defect' as status,
                 '".Auth::user()->Groupp."' as type,
+                'qc' as output_type,
                 '".Auth::user()->username."' as created_by,
                 '".Carbon::now()."' as created_at,
                 '".Carbon::now()."' as updated_at
@@ -406,7 +551,10 @@ class DefectInOut extends Component
             leftJoin("master_plan", "master_plan.id", "=", "output_defects.master_plan_id")->
             leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
             leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects.defect_type_id")->
-            leftJoin("output_defect_in_out", "output_defect_in_out.defect_id", "=", "output_defects.id")->
+            leftJoin("output_defect_in_out", function($join) {
+                $join->on("output_defect_in_out.defect_id", "=", "output_defects.id");
+                $join->on("output_defect_in_out.output_type", "=", DB::raw("'qc'"));
+            })->
             where("output_defects.defect_status", "defect")->
             whereNull("output_defect_in_out.id");
             if ($this->defectInSearch) {
@@ -435,35 +583,39 @@ class DefectInOut extends Component
             if ($this->defectInSelectedType) {
                 $defectInQuery->where("output_defects.defect_type_id", $this->defectInSelectedType);
             }
-            if ($this->defectInQty > 0) {
-                $defectIn = $defectInQuery->
-                    orderBy("master_plan.sewing_line")->
-                    orderBy("master_plan.id_ws")->
-                    orderBy("master_plan.color")->
-                    orderBy("output_defect_types.defect_type")->
-                    orderBy("output_defects.so_det_id")->
-                    orderBy("output_defects.updated_at")->
-                    limit($this->defectInQty)->
-                    get()->
-                    toArray();
+        }
 
-                DefectInOutModel::insert($defectIn);
+        if ($this->defectInQty > 0) {
+            $defectIn = $defectInQuery->
+                orderBy("sewing_line")->
+                orderBy("id_ws")->
+                orderBy("color")->
+                orderBy("defect_type")->
+                orderBy("so_det_id")->
+                orderBy("updated_at")->
+                limit($this->defectInQty)->
+                get()->
+                toArray();
 
-                if (count($defectIn) > 0) {
-                    $this->emit('alert', 'success', count($defectIn)." DEFECT berhasil di masuk ke '".Auth::user()->Groupp."'");
-                } else {
-                    $this->emit('alert', 'warning', "DEFECT gagal masuk ke '".Auth::user()->Groupp."'");
-                }
+            DefectInOutModel::insert($defectIn);
+
+            if (count($defectIn) > 0) {
+                $this->emit('alert', 'success', count($defectIn)." DEFECT berhasil di masuk ke '".Auth::user()->Groupp."'");
             } else {
-                $this->emit('alert', 'warning', "Qty DEFECT IN 0");
+                $this->emit('alert', 'warning', "DEFECT gagal masuk ke '".Auth::user()->Groupp."'");
             }
+        } else {
+            $this->emit('alert', 'warning', "Qty DEFECT IN 0");
+        }
     }
 
     public function saveAllDefectIn() {
-        $defectInQuery = Defect::selectRaw("
+        if ($this->defectInOutputType == 'packing') {
+            $defectInQuery = Defect::selectRaw("
                 output_defects.id as defect_id,
                 'defect' as status,
                 '".Auth::user()->Groupp."' as type,
+                'packing' as output_type,
                 '".Auth::user()->username."' as created_by,
                 '".Carbon::now()."' as created_at,
                 '".Carbon::now()."' as updated_at
@@ -472,7 +624,10 @@ class DefectInOut extends Component
             leftJoin("master_plan", "master_plan.id", "=", "output_defects.master_plan_id")->
             leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
             leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects.defect_type_id")->
-            leftJoin("output_defect_in_out", "output_defect_in_out.defect_id", "=", "output_defects.id")->
+            leftJoin("output_defect_in_out", function($join) {
+                $join->on("output_defect_in_out.defect_id", "=", "output_defects.id");
+                $join->on("output_defect_in_out.output_type", "=", DB::raw("'packing'"));
+            })->
             where("output_defects.defect_status", "defect")->
             whereNull("output_defect_in_out.id");
             if ($this->defectInSearch) {
@@ -501,14 +656,62 @@ class DefectInOut extends Component
             if ($this->defectInSelectedType) {
                 $defectInQuery->where("output_defects.defect_type_id", $this->defectInSelectedType);
             }
-            $defectIn = $defectInQuery->
-                orderBy("master_plan.sewing_line")->
-                orderBy("master_plan.id_ws")->
-                orderBy("master_plan.color")->
-                orderBy("output_defect_types.defect_type")->
-                orderBy("output_defects.so_det_id")->
-                get()->
-                toArray();
+        } else {
+            $defectInQuery = Defect::selectRaw("
+                output_defects.id as defect_id,
+                'defect' as status,
+                '".Auth::user()->Groupp."' as type,
+                'qc' as output_type,
+                '".Auth::user()->username."' as created_by,
+                '".Carbon::now()."' as created_at,
+                '".Carbon::now()."' as updated_at
+            ")->
+            leftJoin("so_det", "so_det.id", "=", "output_defects.so_det_id")->
+            leftJoin("master_plan", "master_plan.id", "=", "output_defects.master_plan_id")->
+            leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
+            leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects.defect_type_id")->
+            leftJoin("output_defect_in_out", function($join) {
+                $join->on("output_defect_in_out.defect_id", "=", "output_defects.id");
+                $join->on("output_defect_in_out.output_type", "=", DB::raw("'qc'"));
+            })->
+            where("output_defects.defect_status", "defect")->
+            whereNull("output_defect_in_out.id");
+            if ($this->defectInSearch) {
+                $defectInQuery->whereRaw("(
+                    master_plan.tgl_plan LIKE '%".$this->defectInSearch."%' OR
+                    master_plan.sewing_line LIKE '%".$this->defectInSearch."%' OR
+                    act_costing.kpno LIKE '%".$this->defectInSearch."%' OR
+                    act_costing.styleno LIKE '%".$this->defectInSearch."%' OR
+                    master_plan.color LIKE '%".$this->defectInSearch."%' OR
+                    output_defect_types.defect_type LIKE '%".$this->defectInSearch."%' OR
+                    so_det.size LIKE '%".$this->defectInSearch."%'
+                )");
+            }
+            if ($this->defectInDate) {
+                $defectInQuery->where("master_plan.tgl_plan", $this->defectInDate);
+            }
+            if ($this->defectInLine) {
+                $defectInQuery->where("master_plan.sewing_line", $this->defectInLine);
+            }
+            if ($this->defectInSelectedMasterPlan) {
+                $defectInQuery->where("master_plan.id", $this->defectInSelectedMasterPlan);
+            }
+            if ($this->defectInSelectedSize) {
+                $defectInQuery->where("output_defects.so_det_id", $this->defectInSelectedSize);
+            }
+            if ($this->defectInSelectedType) {
+                $defectInQuery->where("output_defects.defect_type_id", $this->defectInSelectedType);
+            }
+        }
+
+        $defectIn = $defectInQuery->
+            orderBy("sewing_line")->
+            orderBy("id_ws")->
+            orderBy("color")->
+            orderBy("defect_type")->
+            orderBy("so_det_id")->
+            get()->
+            toArray();
 
         DefectInOutModel::insert($defectIn);
 
@@ -523,12 +726,13 @@ class DefectInOut extends Component
         $defectOutQuery = DefectInOutModel::selectRaw("
             output_defect_in_out.id
         ")->
-        leftJoin("output_defects", "output_defects.id", "=", "output_defect_in_out.defect_id")->
+        leftJoin("output_defects".($this->defectOutOutputType == 'packing' ? '_packing' : '')." as output_defects", "output_defects.id", "=", "output_defect_in_out.defect_id")->
         leftJoin("so_det", "so_det.id", "=", "output_defects.so_det_id")->
         leftJoin("master_plan", "master_plan.id", "=", "output_defects.master_plan_id")->
         leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
         leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects.defect_type_id")->
         where("output_defect_in_out.status", "defect")->
+        where("output_defect_in_out.output_type", $this->defectOutOutputType)->
         where("output_defect_in_out.type", Auth::user()->Groupp);
         if ($this->defectOutSearch) {
             $defectOutQuery->whereRaw("(
@@ -586,12 +790,13 @@ class DefectInOut extends Component
         $defectOutQuery = DefectInOutModel::selectRaw("
             output_defect_in_out.id
         ")->
-        leftJoin("output_defects", "output_defects.id", "=", "output_defect_in_out.defect_id")->
+        leftJoin("output_defects".($this->defectOutOutputType == 'packing' ? '_packing' : '')." as output_defects", "output_defects.id", "=", "output_defect_in_out.defect_id")->
         leftJoin("so_det", "so_det.id", "=", "output_defects.so_det_id")->
         leftJoin("master_plan", "master_plan.id", "=", "output_defects.master_plan_id")->
         leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
         leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects.defect_type_id")->
         where("output_defect_in_out.status", "defect")->
+        where("output_defect_in_out.output_type", $this->defectOutOutputType)->
         where("output_defect_in_out.type", Auth::user()->Groupp);
         if ($this->defectOutSearch) {
             $defectOutQuery->whereRaw("(
@@ -642,39 +847,75 @@ class DefectInOut extends Component
     public function preSaveSelectedDefectIn($data) {
         $thisData = explode("-", $data);
 
-        $defectIn = Defect::selectRaw("
-            master_plan.tgl_plan,
-            master_plan.id master_plan_id,
-            master_plan.id_ws,
-            master_plan.sewing_line,
-            act_costing.kpno as ws,
-            act_costing.styleno as style,
-            master_plan.color as color,
-            output_defects.defect_type_id,
-            output_defect_types.defect_type,
-            output_defects.so_det_id,
-            so_det.size,
-            COUNT(output_defects.id) defect_qty
-        ")->
-        leftJoin("so_det", "so_det.id", "=", "output_defects.so_det_id")->
-        leftJoin("master_plan", "master_plan.id", "=", "output_defects.master_plan_id")->
-        leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
-        leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects.defect_type_id")->
-        leftJoin("output_defect_in_out", "output_defect_in_out.defect_id", "=", "output_defects.id")->
-        where("output_defects.defect_status", "defect")->
-        where("output_defect_types.allocation", Auth::user()->Groupp)->
-        where("master_plan.id", $thisData[0])->
-        where("output_defect_types.id", $thisData[1])->
-        where("output_defects.so_det_id", $thisData[2])->
-        whereNull("output_defect_in_out.id")->
-        groupBy("master_plan.sewing_line", "master_plan.id", "output_defect_types.id", "output_defects.so_det_id")->
-        orderBy("master_plan.sewing_line")->
-        orderBy("master_plan.id_ws")->
-        orderBy("master_plan.color")->
-        orderBy("output_defect_types.defect_type")->
-        orderBy("output_defects.so_det_id")->
-        first();
+        if ($thisData[3] == "packing") {
+            $defectIn = DefectPacking::selectRaw("
+                master_plan.tgl_plan,
+                master_plan.id master_plan_id,
+                master_plan.id_ws,
+                master_plan.sewing_line,
+                act_costing.kpno as ws,
+                act_costing.styleno as style,
+                master_plan.color as color,
+                output_defects_packing.defect_type_id,
+                output_defect_types.defect_type,
+                output_defects_packing.so_det_id,
+                so_det.size,
+                COUNT(output_defects_packing.id) defect_qty
+            ")->
+            leftJoin("so_det", "so_det.id", "=", "output_defects_packing.so_det_id")->
+            leftJoin("master_plan", "master_plan.id", "=", "output_defects_packing.master_plan_id")->
+            leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
+            leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects_packing.defect_type_id")->
+            leftJoin("output_defect_in_out", "output_defect_in_out.defect_id", "=", "output_defects_packing.id")->
+            where("output_defects_packing.defect_status", "defect")->
+            where("output_defect_types.allocation", Auth::user()->Groupp)->
+            where("master_plan.id", $thisData[0])->
+            where("output_defect_types.id", $thisData[1])->
+            where("output_defects_packing.so_det_id", $thisData[2])->
+            whereNull("output_defect_in_out.id")->
+            groupBy("master_plan.sewing_line", "master_plan.id", "output_defect_types.id", "output_defects_packing.so_det_id")->
+            orderBy("master_plan.sewing_line")->
+            orderBy("master_plan.id_ws")->
+            orderBy("master_plan.color")->
+            orderBy("output_defect_types.defect_type")->
+            orderBy("output_defects_packing.so_det_id")->
+            first();
+        } else {
+            $defectIn = Defect::selectRaw("
+                master_plan.tgl_plan,
+                master_plan.id master_plan_id,
+                master_plan.id_ws,
+                master_plan.sewing_line,
+                act_costing.kpno as ws,
+                act_costing.styleno as style,
+                master_plan.color as color,
+                output_defects.defect_type_id,
+                output_defect_types.defect_type,
+                output_defects.so_det_id,
+                so_det.size,
+                COUNT(output_defects.id) defect_qty
+            ")->
+            leftJoin("so_det", "so_det.id", "=", "output_defects.so_det_id")->
+            leftJoin("master_plan", "master_plan.id", "=", "output_defects.master_plan_id")->
+            leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
+            leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects.defect_type_id")->
+            leftJoin("output_defect_in_out", "output_defect_in_out.defect_id", "=", "output_defects.id")->
+            where("output_defects.defect_status", "defect")->
+            where("output_defect_types.allocation", Auth::user()->Groupp)->
+            where("master_plan.id", $thisData[0])->
+            where("output_defect_types.id", $thisData[1])->
+            where("output_defects.so_det_id", $thisData[2])->
+            whereNull("output_defect_in_out.id")->
+            groupBy("master_plan.sewing_line", "master_plan.id", "output_defect_types.id", "output_defects.so_det_id")->
+            orderBy("master_plan.sewing_line")->
+            orderBy("master_plan.id_ws")->
+            orderBy("master_plan.color")->
+            orderBy("output_defect_types.defect_type")->
+            orderBy("output_defects.so_det_id")->
+            first();
+        }
 
+        $this->defectInOutputModal = $thisData[3];
         $this->defectInDateModal = $defectIn->tgl_plan;
         $this->defectInLineModal = $defectIn->sewing_line;
         $this->defectInMasterPlanTextModal = $defectIn->ws." - ".$defectIn->style." - ".$defectIn->color;
@@ -689,36 +930,78 @@ class DefectInOut extends Component
     }
 
     public function saveSelectedDefectIn() {
-        $defectInQuery = Defect::selectRaw("
-            output_defects.id as defect_id,
-            'defect' as status,
-            '".Auth::user()->Groupp."' as type,
-            '".Auth::user()->username."' as created_by,
-            '".Carbon::now()."' as created_at,
-            '".Carbon::now()."' as updated_at
-        ")->
-        leftJoin("so_det", "so_det.id", "=", "output_defects.so_det_id")->
-        leftJoin("master_plan", "master_plan.id", "=", "output_defects.master_plan_id")->
-        leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
-        leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects.defect_type_id")->
-        leftJoin("output_defect_in_out", "output_defect_in_out.defect_id", "=", "output_defects.id")->
-        where("output_defects.defect_status", "defect")->
-        where("output_defect_types.allocation", Auth::user()->Groupp)->
-        whereNull("output_defect_in_out.id");
-        if ($this->defectInDateModal) {
-            $defectInQuery->where("master_plan.tgl_plan", $this->defectInDateModal);
-        }
-        if ($this->defectInLineModal) {
-            $defectInQuery->where("master_plan.sewing_line", $this->defectInLineModal);
-        }
-        if ($this->defectInMasterPlanModal) {
-            $defectInQuery->where("master_plan.id", $this->defectInMasterPlanModal);
-        }
-        if ($this->defectInSizeModal) {
-            $defectInQuery->where("output_defects.so_det_id", $this->defectInSizeModal);
-        }
-        if ($this->defectInTypeModal) {
-            $defectInQuery->where("output_defects.defect_type_id", $this->defectInTypeModal);
+        if ($this->defectInOutputModal == "packing") {
+            $defectInQuery = DefectPacking::selectRaw("
+                output_defects_packing.id as defect_id,
+                'defect' as status,
+                '".Auth::user()->Groupp."' as type,
+                'packing' as output_type,
+                '".Auth::user()->username."' as created_by,
+                '".Carbon::now()."' as created_at,
+                '".Carbon::now()."' as updated_at
+            ")->
+            leftJoin("so_det", "so_det.id", "=", "output_defects_packing.so_det_id")->
+            leftJoin("master_plan", "master_plan.id", "=", "output_defects_packing.master_plan_id")->
+            leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
+            leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects_packing.defect_type_id")->
+            leftJoin("output_defect_in_out", function($join) {
+                $join->on("output_defect_in_out.defect_id", "=", "output_defects_packing.id");
+                $join->on("output_defect_in_out.output_type", "=", DB::raw("'qc'"));
+            })->
+            where("output_defects_packing.defect_status", "defect")->
+            where("output_defect_types.allocation", Auth::user()->Groupp)->
+            whereNull("output_defect_in_out.id");
+            if ($this->defectInDateModal) {
+                $defectInQuery->where("master_plan.tgl_plan", $this->defectInDateModal);
+            }
+            if ($this->defectInLineModal) {
+                $defectInQuery->where("master_plan.sewing_line", $this->defectInLineModal);
+            }
+            if ($this->defectInMasterPlanModal) {
+                $defectInQuery->where("master_plan.id", $this->defectInMasterPlanModal);
+            }
+            if ($this->defectInSizeModal) {
+                $defectInQuery->where("output_defects_packing.so_det_id", $this->defectInSizeModal);
+            }
+            if ($this->defectInTypeModal) {
+                $defectInQuery->where("output_defects_packing.defect_type_id", $this->defectInTypeModal);
+            }
+        } else {
+            $defectInQuery = DefectPacking::selectRaw("
+                output_defects_packing.id as defect_id,
+                'defect' as status,
+                '".Auth::user()->Groupp."' as type,
+                'qc' as output_type,
+                '".Auth::user()->username."' as created_by,
+                '".Carbon::now()."' as created_at,
+                '".Carbon::now()."' as updated_at
+            ")->
+            leftJoin("so_det", "so_det.id", "=", "output_defects_packing.so_det_id")->
+            leftJoin("master_plan", "master_plan.id", "=", "output_defects_packing.master_plan_id")->
+            leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
+            leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects_packing.defect_type_id")->
+            leftJoin("output_defect_in_out", function($join) {
+                $join->on("output_defect_in_out.defect_id", "=", "output_defects_packing.id");
+                $join->on("output_defect_in_out.output_type", "=", DB::raw("'packing'"));
+            })->
+            where("output_defects_packing.defect_status", "defect")->
+            where("output_defect_types.allocation", Auth::user()->Groupp)->
+            whereNull("output_defect_in_out.id");
+            if ($this->defectInDateModal) {
+                $defectInQuery->where("master_plan.tgl_plan", $this->defectInDateModal);
+            }
+            if ($this->defectInLineModal) {
+                $defectInQuery->where("master_plan.sewing_line", $this->defectInLineModal);
+            }
+            if ($this->defectInMasterPlanModal) {
+                $defectInQuery->where("master_plan.id", $this->defectInMasterPlanModal);
+            }
+            if ($this->defectInSizeModal) {
+                $defectInQuery->where("output_defects_packing.so_det_id", $this->defectInSizeModal);
+            }
+            if ($this->defectInTypeModal) {
+                $defectInQuery->where("output_defects_packing.defect_type_id", $this->defectInTypeModal);
+            }
         }
 
         if ($this->defectInQtyModal > 0 && $this->defectInQtyModal <= $defectInQuery->count()) {
@@ -727,12 +1010,15 @@ class DefectInOut extends Component
                 orderBy("master_plan.id_ws")->
                 orderBy("master_plan.color")->
                 orderBy("output_defect_types.defect_type")->
-                orderBy("output_defects.so_det_id")->
                 limit($this->defectInQtyModal)->
                 get()->
                 toArray();
 
-            DefectInOutModel::insert($defectIn);
+            $data = array_map(function ($value) {
+                return (array)$value;
+            }, $defectIn);
+
+            DefectInOutModel::insert($data);
 
             if (count($defectIn) > 0) {
                 $this->emit('alert', 'success', count($defectIn)." DEFECT berhasil di masuk ke '".Auth::user()->Groupp."'");
@@ -763,17 +1049,19 @@ class DefectInOut extends Component
             so_det.size,
             COUNT(output_defects.id) defect_qty
         ")->
-        leftJoin("output_defects", "output_defects.id", "=", "output_defect_in_out.defect_id")->
+        leftJoin("output_defects".($this->defectOutOutputType == 'packing' ? '_packing' : '')." as output_defects", "output_defects.id", "=", "output_defect_in_out.defect_id")->
         leftJoin("so_det", "so_det.id", "=", "output_defects.so_det_id")->
         leftJoin("master_plan", "master_plan.id", "=", "output_defects.master_plan_id")->
         leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
         leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects.defect_type_id")->
         where("output_defect_types.allocation", Auth::user()->Groupp)->
         where("output_defect_in_out.type", Auth::user()->Groupp)->
+        where("output_defect_in_out.output_type", $this->defectOutOutputType)->
         where("output_defect_in_out.created_by", Auth::user()->username)->
         where("master_plan.id", $thisData[0])->
         where("output_defect_types.id", $thisData[1])->
         where("output_defects.so_det_id", $thisData[2])->
+        where("output_defect_in_out.output_type", $thisData[3])->
         groupBy("master_plan.sewing_line", "master_plan.id", "output_defect_types.id", "output_defects.so_det_id")->
         orderBy("master_plan.sewing_line")->
         orderBy("master_plan.id_ws")->
@@ -782,6 +1070,7 @@ class DefectInOut extends Component
         orderBy("output_defects.so_det_id")->
         first();
 
+        $this->defectOutOutputModal = $thisData[3];
         $this->defectOutDateModal = $defectOut->tgl_plan;
         $this->defectOutLineModal = $defectOut->sewing_line;
         $this->defectOutMasterPlanTextModal = $defectOut->ws." - ".$defectOut->style." - ".$defectOut->color;
@@ -799,13 +1088,14 @@ class DefectInOut extends Component
         $defectOutQuery = DefectInOutModel::selectRaw("
             output_defect_in_out.id
         ")->
-        leftJoin("output_defects", "output_defects.id", "=", "output_defect_in_out.defect_id")->
+        leftJoin("output_defects".($this->defectOutOutputType == 'packing' ? '_packing' : '')." as output_defects", "output_defects.id", "=", "output_defect_in_out.defect_id")->
         leftJoin("so_det", "so_det.id", "=", "output_defects.so_det_id")->
         leftJoin("master_plan", "master_plan.id", "=", "output_defects.master_plan_id")->
         leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
         leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects.defect_type_id")->
         where("output_defect_types.allocation", Auth::user()->Groupp)->
         where("output_defect_in_out.status", "defect")->
+        where("output_defect_in_out.output_type", $this->defectOutOutputType)->
         where("output_defect_in_out.type", Auth::user()->Groupp);
         if ($this->defectOutDateModal) {
             $defectOutQuery->where("master_plan.tgl_plan", $this->defectOutDateModal);
@@ -872,60 +1162,122 @@ class DefectInOut extends Component
 
         $this->lines = UserPassword::where("Groupp", "SEWING")->orderBy("line_id", "asc")->get();
 
-        $defectInQuery = Defect::selectRaw("
-            master_plan.id master_plan_id,
-            master_plan.id_ws,
-            master_plan.sewing_line,
-            act_costing.kpno as ws,
-            act_costing.styleno as style,
-            master_plan.color as color,
-            output_defects.defect_type_id,
-            output_defect_types.defect_type,
-            output_defects.so_det_id,
-            so_det.size,
-            COUNT(output_defects.id) defect_qty
-        ")->
-        leftJoin("so_det", "so_det.id", "=", "output_defects.so_det_id")->
-        leftJoin("master_plan", "master_plan.id", "=", "output_defects.master_plan_id")->
-        leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
-        leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects.defect_type_id")->
-        leftJoin("output_defect_in_out", "output_defect_in_out.defect_id", "=", "output_defects.id")->
-        where("output_defects.defect_status", "defect")->
-        where("output_defect_types.allocation", Auth::user()->Groupp)->
-        whereNull("output_defect_in_out.id");
-        if ($this->defectInSearch) {
-            $defectInQuery->whereRaw("(
-                master_plan.tgl_plan LIKE '%".$this->defectInSearch."%' OR
-                master_plan.sewing_line LIKE '%".$this->defectInSearch."%' OR
-                act_costing.kpno LIKE '%".$this->defectInSearch."%' OR
-                act_costing.styleno LIKE '%".$this->defectInSearch."%' OR
-                master_plan.color LIKE '%".$this->defectInSearch."%' OR
-                output_defect_types.defect_type LIKE '%".$this->defectInSearch."%' OR
-                so_det.size LIKE '%".$this->defectInSearch."%'
-            )");
+        if ($this->defectInOutputType == 'packing') {
+            $defectInQuery = DefectPacking::selectRaw("
+                master_plan.id master_plan_id,
+                master_plan.id_ws,
+                master_plan.sewing_line,
+                act_costing.kpno as ws,
+                act_costing.styleno as style,
+                master_plan.color as color,
+                output_defects_packing.defect_type_id,
+                output_defect_types.defect_type,
+                output_defects_packing.so_det_id,
+                so_det.size,
+                'packing' output_type,
+                COUNT(output_defects_packing.id) defect_qty
+            ")->
+            leftJoin("so_det", "so_det.id", "=", "output_defects_packing.so_det_id")->
+            leftJoin("master_plan", "master_plan.id", "=", "output_defects_packing.master_plan_id")->
+            leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
+            leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects_packing.defect_type_id")->
+            leftJoin("output_defect_in_out", function($join) {
+                $join->on("output_defect_in_out.defect_id", "=", "output_defects_packing.id");
+                $join->on("output_defect_in_out.output_type", "=", DB::raw("'packing'"));
+            })->
+            where("output_defects_packing.defect_status", "defect")->
+            where("output_defect_types.allocation", Auth::user()->Groupp)->
+            whereNull("output_defect_in_out.id");
+            if ($this->defectInSearch) {
+                $defectInQuery->whereRaw("(
+                    master_plan.tgl_plan LIKE '%".$this->defectInSearch."%' OR
+                    master_plan.sewing_line LIKE '%".$this->defectInSearch."%' OR
+                    act_costing.kpno LIKE '%".$this->defectInSearch."%' OR
+                    act_costing.styleno LIKE '%".$this->defectInSearch."%' OR
+                    master_plan.color LIKE '%".$this->defectInSearch."%' OR
+                    output_defect_types.defect_type LIKE '%".$this->defectInSearch."%' OR
+                    so_det.size LIKE '%".$this->defectInSearch."%'
+                )");
+            }
+            if ($this->defectInDate) {
+                $defectInQuery->where("master_plan.tgl_plan", $this->defectInDate);
+            }
+            if ($this->defectInLine) {
+                $defectInQuery->where("master_plan.sewing_line", $this->defectInLine);
+            }
+            if ($this->defectInSelectedMasterPlan) {
+                $defectInQuery->where("master_plan.id", $this->defectInSelectedMasterPlan);
+            }
+            if ($this->defectInSelectedSize) {
+                $defectInQuery->where("output_defects_packing.so_det_id", $this->defectInSelectedSize);
+            }
+            if ($this->defectInSelectedType) {
+                $defectInQuery->where("output_defects_packing.defect_type_id", $this->defectInSelectedType);
+            }
+            $defectIn = $defectInQuery->
+                groupBy("master_plan.sewing_line", "master_plan.id", "output_defect_types.id", "output_defects_packing.so_det_id");
+        } else {
+            $defectInQuery = Defect::selectRaw("
+                master_plan.id master_plan_id,
+                master_plan.id_ws,
+                master_plan.sewing_line,
+                act_costing.kpno as ws,
+                act_costing.styleno as style,
+                master_plan.color as color,
+                output_defects.defect_type_id,
+                output_defect_types.defect_type,
+                output_defects.so_det_id,
+                so_det.size,
+                'qc' output_type,
+                COUNT(output_defects.id) defect_qty
+            ")->
+            leftJoin("so_det", "so_det.id", "=", "output_defects.so_det_id")->
+            leftJoin("master_plan", "master_plan.id", "=", "output_defects.master_plan_id")->
+            leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
+            leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects.defect_type_id")->
+            leftJoin("output_defect_in_out", function($join) {
+                $join->on("output_defect_in_out.defect_id", "=", "output_defects.id");
+                $join->on("output_defect_in_out.output_type", "=", DB::raw("'qc'"));
+            })->
+            where("output_defects.defect_status", "defect")->
+            where("output_defect_types.allocation", Auth::user()->Groupp)->
+            whereNull("output_defect_in_out.id");
+            if ($this->defectInSearch) {
+                $defectInQuery->whereRaw("(
+                    master_plan.tgl_plan LIKE '%".$this->defectInSearch."%' OR
+                    master_plan.sewing_line LIKE '%".$this->defectInSearch."%' OR
+                    act_costing.kpno LIKE '%".$this->defectInSearch."%' OR
+                    act_costing.styleno LIKE '%".$this->defectInSearch."%' OR
+                    master_plan.color LIKE '%".$this->defectInSearch."%' OR
+                    output_defect_types.defect_type LIKE '%".$this->defectInSearch."%' OR
+                    so_det.size LIKE '%".$this->defectInSearch."%'
+                )");
+            }
+            if ($this->defectInDate) {
+                $defectInQuery->where("master_plan.tgl_plan", $this->defectInDate);
+            }
+            if ($this->defectInLine) {
+                $defectInQuery->where("master_plan.sewing_line", $this->defectInLine);
+            }
+            if ($this->defectInSelectedMasterPlan) {
+                $defectInQuery->where("master_plan.id", $this->defectInSelectedMasterPlan);
+            }
+            if ($this->defectInSelectedSize) {
+                $defectInQuery->where("output_defects.so_det_id", $this->defectInSelectedSize);
+            }
+            if ($this->defectInSelectedType) {
+                $defectInQuery->where("output_defects.defect_type_id", $this->defectInSelectedType);
+            }
+            $defectIn = $defectInQuery->
+                groupBy("master_plan.sewing_line", "master_plan.id", "output_defect_types.id", "output_defects.so_det_id");
         }
-        if ($this->defectInDate) {
-            $defectInQuery->where("master_plan.tgl_plan", $this->defectInDate);
-        }
-        if ($this->defectInLine) {
-            $defectInQuery->where("master_plan.sewing_line", $this->defectInLine);
-        }
-        if ($this->defectInSelectedMasterPlan) {
-            $defectInQuery->where("master_plan.id", $this->defectInSelectedMasterPlan);
-        }
-        if ($this->defectInSelectedSize) {
-            $defectInQuery->where("output_defects.so_det_id", $this->defectInSelectedSize);
-        }
-        if ($this->defectInSelectedType) {
-            $defectInQuery->where("output_defects.defect_type_id", $this->defectInSelectedType);
-        }
-        $defectInList = $defectInQuery->
-            groupBy("master_plan.sewing_line", "master_plan.id", "output_defect_types.id", "output_defects.so_det_id")->
-            orderBy("master_plan.sewing_line")->
-            orderBy("master_plan.id_ws")->
-            orderBy("master_plan.color")->
-            orderBy("output_defect_types.defect_type")->
-            orderBy("output_defects.so_det_id")->
+
+        $defectInList = $defectIn->orderBy("sewing_line")->
+            orderBy("id_ws")->
+            orderBy("color")->
+            orderBy("defect_type")->
+            orderBy("so_det_id")->
+            orderBy("output_type")->
             paginate(10, ['*'], 'defectInPage');
 
         $defectOutQuery = DefectInOutModel::selectRaw("
@@ -938,16 +1290,18 @@ class DefectInOut extends Component
             output_defects.defect_type_id,
             output_defect_types.defect_type,
             output_defects.so_det_id,
+            output_defect_in_out.output_type,
             so_det.size,
             COUNT(output_defect_in_out.id) defect_qty
         ")->
-        leftJoin("output_defects", "output_defects.id", "=", "output_defect_in_out.defect_id")->
+        leftJoin("output_defects".($this->defectOutOutputType == 'packing' ? '_packing' : '')." as output_defects", "output_defects.id", "=", "output_defect_in_out.defect_id")->
         leftJoin("so_det", "so_det.id", "=", "output_defects.so_det_id")->
         leftJoin("master_plan", "master_plan.id", "=", "output_defects.master_plan_id")->
         leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
         leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects.defect_type_id")->
         where("output_defect_types.allocation", Auth::user()->Groupp)->
         where("output_defect_in_out.status", "defect")->
+        where("output_defect_in_out.output_type", $this->defectOutOutputType)->
         where("output_defect_in_out.type", Auth::user()->Groupp);
         if ($this->defectOutSearch) {
             $defectOutQuery->whereRaw("(
@@ -976,7 +1330,7 @@ class DefectInOut extends Component
             $defectOutQuery->where("output_defects.defect_type_id", $this->defectOutSelectedType);
         }
         $defectOutList = $defectOutQuery->
-            groupBy("master_plan.sewing_line", "master_plan.id", "output_defect_types.id", "output_defects.so_det_id")->
+            groupBy("master_plan.sewing_line", "master_plan.id", "output_defect_types.id", "output_defects.so_det_id", "output_defect_in_out.output_type")->
             orderBy("master_plan.sewing_line")->
             orderBy("master_plan.id_ws")->
             orderBy("master_plan.color")->
@@ -990,50 +1344,115 @@ class DefectInOut extends Component
                 TIME(output_defect_in_out.created_at) time_in,
                 DATE(output_defect_in_out.reworked_at) date_out,
                 TIME(output_defect_in_out.reworked_at) time_out,
-                master_plan.sewing_line,
-                output_defects.kode_numbering,
-                act_costing.kpno as ws,
-                act_costing.styleno as style,
-                master_plan.color as color,
-                so_det.size,
-                output_defects.defect_type_id,
-                output_defect_types.defect_type,
-                output_defect_areas.defect_area,
+                COALESCE(output_defects.sewing_line, output_defects_packing.sewing_line) sewing_line,
+                COALESCE(output_defects.kode_numbering, output_defects_packing.kode_numbering) kode_numbering,
+                COALESCE(output_defects.kpno, output_defects_packing.kpno) as ws,
+                COALESCE(output_defects.styleno, output_defects_packing.styleno) as style,
+                COALESCE(output_defects.color, output_defects_packing.color) as color,
+                COALESCE(output_defects.size, output_defects_packing.size) size,
+                COALESCE(output_defects.defect_type_id, output_defects_packing.defect_type_id) defect_type_id,
+                COALESCE(output_defects.defect_type, output_defects_packing.defect_type) defect_type,
+                COALESCE(output_defects.defect_area, output_defects_packing.defect_area) defect_area,
                 output_defect_in_out.status,
-                master_plan.gambar,
-                output_defects.defect_area_x,
-                output_defects.defect_area_y
+                COALESCE(output_defects.gambar, output_defects_packing.gambar) gambar,
+                COALESCE(output_defects.defect_area_x, output_defects_packing.defect_area_x) defect_area_x,
+                COALESCE(output_defects.defect_area_y, output_defects_packing.defect_area_y) defect_area_y
             ")->
-            leftJoin("output_defects", "output_defects.id", "=", "output_defect_in_out.defect_id")->
-            leftJoin("so_det", "so_det.id", "=", "output_defects.so_det_id")->
-            leftJoin("master_plan", "master_plan.id", "=", "output_defects.master_plan_id")->
-            leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
-            leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects.defect_type_id")->
-            leftJoin("output_defect_areas", "output_defect_areas.id", "=", "output_defects.defect_area_id")->
-            where("output_defect_types.allocation", Auth::user()->Groupp)->
-            where("output_defect_in_out.type", Auth::user()->Groupp)->
-            whereBetween("output_defects.updated_at", [$this->date." 00:00:00", $this->date." 23:59:59"]);
+            leftJoin(DB::raw("
+                (
+                    select
+                        output_defects.id,
+                        output_defects.so_det_id,
+                        output_defects.kode_numbering,
+                        output_defects.defect_type_id,
+                        output_defects.defect_area_x,
+                        output_defects.defect_area_y,
+                        output_defect_types.defect_type,
+                        output_defect_areas.defect_area,
+                        master_plan.id_ws,
+                        master_plan.sewing_line,
+                        act_costing.kpno,
+                        act_costing.styleno,
+                        master_plan.color,
+                        master_plan.gambar,
+                        so_det.size
+                    from
+                        output_defects as output_defects
+                        left join master_plan on master_plan.id = output_defects.master_plan_id
+                        left join act_costing on act_costing.id = master_plan.id_ws
+                        left join so_det on so_det.id = output_defects.so_det_id
+                        left join output_defect_types on output_defect_types.id = output_defects.defect_type_id
+                        left join output_defect_areas on output_defect_areas.id = output_defects.defect_area_id
+                    where
+                        output_defects.updated_at between '".date('Y-m-d'.strtotime($this->date." -7 days"))." 00:00:00' and '".$this->date." 23:59:59'
+                        and
+                        output_defect_types.allocation = '".Auth::user()->Groupp."'
+                ) output_defects
+            "), function($join){
+                $join->on("output_defects.id", "=", "output_defect_in_out.defect_id");
+                $join->on("output_defect_in_out.output_type", "=", DB::raw("'qc'"));
+            })->
+            leftJoin(DB::raw("
+                (
+                    select
+                        output_defects_packing.id,
+                        output_defects_packing.so_det_id,
+                        output_defects_packing.kode_numbering,
+                        output_defects_packing.defect_type_id,
+                        output_defects_packing.defect_area_x,
+                        output_defects_packing.defect_area_y,
+                        output_defect_types.defect_type,
+                        output_defect_areas.defect_area,
+                        master_plan.id_ws,
+                        master_plan.sewing_line,
+                        act_costing.kpno,
+                        act_costing.styleno,
+                        master_plan.color,
+                        master_plan.gambar,
+                        so_det.size
+                    from
+                        output_defects_packing
+                        left join master_plan on master_plan.id = output_defects_packing.master_plan_id
+                        left join act_costing on act_costing.id = master_plan.id_ws
+                        left join so_det on so_det.id = output_defects_packing.so_det_id
+                        left join output_defect_types on output_defect_types.id = output_defects_packing.defect_type_id
+                        left join output_defect_areas on output_defect_areas.id = output_defects_packing.defect_area_id
+                    where
+                        output_defects_packing.updated_at between '".date('Y-m-d'.strtotime($this->date." -7 days"))." 00:00:00' and '".$this->date." 23:59:59'
+                        and
+                        output_defect_types.allocation = '".Auth::user()->Groupp."'
+                ) output_defects_packing
+            "), function($join){
+                $join->on("output_defects_packing.id", "=", "output_defect_in_out.defect_id");
+                $join->on("output_defect_in_out.output_type", "=", DB::raw("'packing'"));
+            })->
+            whereRaw("(
+                output_defect_in_out.created_at between '".$this->date." 00:00:00' and '".$this->date." 23:59:59' OR
+                output_defect_in_out.updated_at between '".$this->date." 00:00:00' and '".$this->date." 23:59:59' OR
+                output_defect_in_out.reworked_at between '".$this->date." 00:00:00' and '".$this->date." 23:59:59'
+            )")->
+            where("output_defect_in_out.type", Auth::user()->Groupp);
 
             if ($this->defectInOutSearch) {
                 $defectInOutQuery->whereRaw("(
-                    master_plan.tgl_plan LIKE '%".$this->defectInOutSearch."%' OR
-                    master_plan.sewing_line LIKE '%".$this->defectInOutSearch."%' OR
-                    act_costing.kpno LIKE '%".$this->defectInOutSearch."%' OR
-                    act_costing.styleno LIKE '%".$this->defectInOutSearch."%' OR
-                    master_plan.color LIKE '%".$this->defectInOutSearch."%' OR
+                    output_defects.tgl_plan LIKE '%".$this->defectInOutSearch."%' OR
+                    output_defects.sewing_line LIKE '%".$this->defectInOutSearch."%' OR
+                    output_defects.kpno LIKE '%".$this->defectInOutSearch."%' OR
+                    output_defects.styleno LIKE '%".$this->defectInOutSearch."%' OR
+                    output_defects.color LIKE '%".$this->defectInOutSearch."%' OR
                     output_defects.kode_numbering LIKE '%".$this->defectInSearch."%' OR
-                    output_defect_types.defect_type LIKE '%".$this->defectInOutSearch."%' OR
+                    output_defects.defect_type LIKE '%".$this->defectInOutSearch."%' OR
                     output_defect_in_out.updated_at LIKE '%".$this->defectInOutSearch."%' OR
-                    so_det.size LIKE '%".$this->defectInOutSearch."%'
+                    output_defects.size LIKE '%".$this->defectInOutSearch."%'
                 )");
             }
 
             $defectInOutList = $defectInOutQuery->
                 groupBy("output_defect_in_out.id")->
-                orderBy("master_plan.sewing_line")->
-                orderBy("master_plan.id_ws")->
-                orderBy("master_plan.color")->
-                orderBy("output_defect_types.defect_type")->
+                orderBy("output_defects.sewing_line")->
+                orderBy("output_defects.id_ws")->
+                orderBy("output_defects.color")->
+                orderBy("output_defects.defect_type")->
                 orderBy("output_defects.so_det_id")->
                 paginate(10, ['*'], 'defectInOutPage');
 
@@ -1042,6 +1461,8 @@ class DefectInOut extends Component
 
     public function refreshComponent()
     {
+        $this->emit('loadingStart');
         $this->emit('$refresh');
+        $this->emit('loadingEnd');
     }
 }
