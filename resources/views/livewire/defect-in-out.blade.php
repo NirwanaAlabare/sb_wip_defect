@@ -477,6 +477,7 @@
                                     <th>Date OUT</th>
                                     <th>Time OUT</th>
                                     <th>Line</th>
+                                    <th>Output</th>
                                     <th>QR</th>
                                     <th>No. WS</th>
                                     <th>Style</th>
@@ -502,6 +503,7 @@
                                             <td class="text-nowrap">{{ $defectInOut->date_out }}</td>
                                             <td class="text-nowrap">{{ $defectInOut->time_out }}</td>
                                             <td class="text-nowrap">{{ strtoupper(str_replace("_", " ", $defectInOut->sewing_line)) }}</td>
+                                            <td class="text-nowrap fw-bold {{ $defectInOut->output_type == 'qc' ? 'text-danger' : 'text-success' }}">{{ strtoupper($defectInOut->output_type) }}</td>
                                             <td class="text-nowrap">{{ $defectInOut->kode_numbering }}</td>
                                             <td class="text-nowrap">{{ $defectInOut->ws }}</td>
                                             <td class="text-nowrap">{{ $defectInOut->style }}</td>
