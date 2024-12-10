@@ -48,7 +48,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3" wire:ignore>
-                                <label class="form-label fw-bold">Output</label>
+                                <label class="form-label fw-bold">Departemen</label>
                                 <select class="form-select" id="select-defect-in-output" wire:model="defectInOutputType">
                                     <option value="qc">QC</option>
                                     <option value="packing">PACKING</option>
@@ -122,7 +122,7 @@
                                         <th>Size</th>
                                         <th>Type</th>
                                         <th>Qty</th>
-                                        <th>Output</th>
+                                        <th>Dept.</th>
                                         <th><input class="form-check-input" type="checkbox" value="" id="defect-in-select-all" onclick="defectInSelectAll(this)" style="scale: 1.3"></th>
                                         <th>IN</th>
                                     </tr>
@@ -262,7 +262,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3" wire:ignore>
-                                <label class="form-label fw-bold">Output</label>
+                                <label class="form-label fw-bold">Department</label>
                                 <select class="form-select" id="select-defect-in-output" wire:model="defectOutOutputType">
                                     <option value="qc">QC</option>
                                     <option value="packing">PACKING</option>
@@ -335,7 +335,7 @@
                                         <th>Master Plan</th>
                                         <th>Size</th>
                                         <th>Type</th>
-                                        <th>Qty</th>
+                                        <th>Dept.</th>
                                         <th>Output</th>
                                         <th><input class="form-check-input" type="checkbox" value="" id="defect-out-select-all" onchange="defectOutSelectAll(this)" style="scale: 1.3"></th>
                                         <th>IN</th>
@@ -477,7 +477,7 @@
                                     <th>Date OUT</th>
                                     <th>Time OUT</th>
                                     <th>Line</th>
-                                    <th>Output</th>
+                                    <th>Department</th>
                                     <th>QR</th>
                                     <th>No. WS</th>
                                     <th>Style</th>
