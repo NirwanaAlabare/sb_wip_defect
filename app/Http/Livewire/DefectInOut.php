@@ -1037,6 +1037,114 @@ class DefectInOut extends Component
         }
     }
 
+    public function preSaveSelectedDefectOut($data) {
+        $thisData = explode("-", $data);
+
+        $defectOut = DefectInOutModel::selectRaw("
+            master_plan.tgl_plan,
+            master_plan.id master_plan_id,
+            master_plan.id_ws,
+            master_plan.sewing_line,
+            act_costing.kpno as ws,
+            act_costing.styleno as style,
+            master_plan.color as color,
+            output_defects.defect_type_id,
+            output_defect_types.defect_type,
+            output_defects.so_det_id,
+            so_det.size,
+            COUNT(output_defects.id) defect_qty
+        ")->
+        leftJoin("output_defects".($this->defectOutOutputType == 'packing' ? '_packing' : '')." as output_defects", "output_defects.id", "=", "output_defect_in_out.defect_id")->
+        leftJoin("so_det", "so_det.id", "=", "output_defects.so_det_id")->
+        leftJoin("master_plan", "master_plan.id", "=", "output_defects.master_plan_id")->
+        leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
+        leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects.defect_type_id")->
+        where("output_defect_types.allocation", Auth::user()->Groupp)->
+        where("output_defect_in_out.type", Auth::user()->Groupp)->
+        where("output_defect_in_out.output_type", $this->defectOutOutputType)->
+        where("output_defect_in_out.created_by", Auth::user()->username)->
+        where("master_plan.id", $thisData[0])->
+        where("output_defect_types.id", $thisData[1])->
+        where("output_defects.so_det_id", $thisData[2])->
+        where("output_defect_in_out.output_type", $thisData[3])->
+        groupBy("master_plan.sewing_line", "master_plan.id", "output_defect_types.id", "output_defects.so_det_id")->
+        orderBy("master_plan.sewing_line")->
+        orderBy("master_plan.id_ws")->
+        orderBy("master_plan.color")->
+        orderBy("output_defect_types.defect_type")->
+        orderBy("output_defects.so_det_id")->
+        first();
+
+        $this->defectOutOutputModal = $thisData[3];
+        $this->defectOutDateModal = $defectOut->tgl_plan;
+        $this->defectOutLineModal = $defectOut->sewing_line;
+        $this->defectOutMasterPlanTextModal = $defectOut->ws." - ".$defectOut->style." - ".$defectOut->color;
+        $this->defectOutMasterPlanModal = $defectOut->master_plan_id;
+        $this->defectOutSizeTextModal = $defectOut->size;
+        $this->defectOutSizeModal = $defectOut->so_det_id;
+        $this->defectOutTypeTextModal = $defectOut->defect_type;
+        $this->defectOutTypeModal = $defectOut->defect_type_id;
+        $this->defectOutQtyModal = $defectOut->defect_qty;
+
+        $this->emit('showModal', 'defectOut');
+    }
+
+    public function saveSelectedDefectOut() {
+        $defectOutQuery = DefectInOutModel::selectRaw("
+            output_defect_in_out.id
+        ")->
+        leftJoin("output_defects".($this->defectOutOutputType == 'packing' ? '_packing' : '')." as output_defects", "output_defects.id", "=", "output_defect_in_out.defect_id")->
+        leftJoin("so_det", "so_det.id", "=", "output_defects.so_det_id")->
+        leftJoin("master_plan", "master_plan.id", "=", "output_defects.master_plan_id")->
+        leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
+        leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects.defect_type_id")->
+        where("output_defect_types.allocation", Auth::user()->Groupp)->
+        where("output_defect_in_out.status", "defect")->
+        where("output_defect_in_out.output_type", $this->defectOutOutputType)->
+        where("output_defect_in_out.type", Auth::user()->Groupp);
+        if ($this->defectOutDateModal) {
+            $defectOutQuery->where("master_plan.tgl_plan", $this->defectOutDateModal);
+        }
+        if ($this->defectOutLineModal) {
+            $defectOutQuery->where("master_plan.sewing_line", $this->defectOutLineModal);
+        }
+        if ($this->defectOutMasterPlanModal) {
+            $defectOutQuery->where("master_plan.id", $this->defectOutMasterPlanModal);
+        }
+        if ($this->defectOutSizeModal) {
+            $defectOutQuery->where("output_defects.so_det_id", $this->defectOutSizeModal);
+        }
+        if ($this->defectOutTypeModal) {
+            $defectOutQuery->where("output_defects.defect_type_id", $this->defectOutTypeModal);
+        }
+
+        if ($this->defectOutQtyModal > 0) {
+            $defectOut = $defectOutQuery->
+                orderBy("master_plan.sewing_line")->
+                orderBy("master_plan.id_ws")->
+                orderBy("master_plan.color")->
+                orderBy("output_defect_types.defect_type")->
+                orderBy("output_defects.so_det_id")->
+                limit($this->defectOutQtyModal)->
+                pluck("id");
+
+            DefectInOutModel::whereIn("id", $defectOut)->update([
+                "status" => "reworked",
+                "reworked_at" => Carbon::now()
+            ]);
+
+            if (count($defectOut) > 0) {
+                $this->emit('alert', 'success', count($defectOut)." DEFECT berhasil keluar dari '".Auth::user()->Groupp."'");
+            } else {
+                $this->emit('alert', 'warning', "DEFECT gagal keluar dari '".Auth::user()->Groupp."'");
+            }
+        } else {
+            $this->emit('alert', 'warning', "Qty DEFECT OUT 0");
+        }
+
+        $this->emit('hideModal', 'defectOut');
+    }
+
     public function showDefectAreaImage($productTypeImage, $x, $y)
     {
         $this->productTypeImage = $productTypeImage;
@@ -1365,7 +1473,7 @@ class DefectInOut extends Component
                 orderBy("output_defects_packing.so_det_id")->
                 paginate(10, ['*'], 'defectInOutPage');
 
-        return view('livewire.defect-in-out', ["defectInList" => $defectInList, "defectOutList" => $defectOutList, "defectInOutList" => $defectInOutList, "totalDefectInOut" => $defectInOutList->count()]);
+        return view('livewire.defect-in-out', ["defectInList" => $defectInList, "defectOutList" => $defectOutList, "defectInOutList" => $defectInOutList, "totalDefectIn" => $defectInList->count(), "totalDefectOut" => $defectOutList->count(), "totalDefectInOut" => $defectInOutList->count()]);
     }
 
     public function refreshComponent()
