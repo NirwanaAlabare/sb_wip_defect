@@ -1116,8 +1116,11 @@ class DefectInOut extends Component
 
         if ($this->defectOutQtyModal > 0) {
             $defectOut = $defectOutQuery->
-                groupBy("output_defect_in.id")->
-                orderBy("output_defect_in.id")->
+                orderBy("master_plan.sewing_line")->
+                orderBy("master_plan.id_ws")->
+                orderBy("master_plan.color")->
+                orderBy("output_defect_types.defect_type")->
+                orderBy("output_defects.so_det_id")->
                 limit($this->defectOutQtyModal)->
                 pluck("id");
 
