@@ -48,7 +48,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3" wire:ignore>
-                                <label class="form-label fw-bold">Departemen</label>
+                                <label class="form-label fw-bold">Department</label>
                                 <select class="form-select" id="select-defect-in-output" wire:model="defectInOutputType">
                                     <option value="qc">QC</option>
                                     <option value="packing">PACKING</option>
@@ -186,8 +186,9 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label class="form-label">Output</label>
-                                    <input type="text" class="form-control form-control-sm" wire:model="defectInOutputModal" readonly>
+                                    <label class="form-label">Department</label>
+                                    <input type="text" class="form-control form-control-sm d-none" wire:model="defectInOutputModal" readonly>
+                                    <input type="text" class="form-control form-control-sm" value="{{ strtoupper($defectInOutputModal) }}" readonly>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -400,8 +401,9 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label class="form-label">Output</label>
-                                    <input type="text" class="form-control form-control-sm" wire:model="defectOutOutputModal" readonly>
+                                    <label class="form-label">Department</label>
+                                    <input type="text" class="form-control form-control-sm d-none" wire:model="defectInOutputModal" readonly>
+                                    <input type="text" class="form-control form-control-sm" value="{{ strtoupper($defectInOutputModal) }}" readonly>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -492,7 +494,7 @@
                             <tbody>
                                 @if ($defectInOutList->count() < 1)
                                     <tr class="text-center align-middle">
-                                        <td colspan="15" class="text-center">Data tidak ditemukan</td>
+                                        <td colspan="16" class="text-center">Data tidak ditemukan</td>
                                     </tr>
                                 @else
                                     @foreach ($defectInOutList as $defectInOut)

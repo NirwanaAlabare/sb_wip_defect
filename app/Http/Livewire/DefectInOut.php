@@ -951,7 +951,7 @@ class DefectInOut extends Component
             leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects_packing.defect_type_id")->
             leftJoin("output_defect_in_out", function($join) {
                 $join->on("output_defect_in_out.defect_id", "=", "output_defects_packing.id");
-                $join->on("output_defect_in_out.output_type", "=", DB::raw("'qc'"));
+                $join->on("output_defect_in_out.output_type", "=", DB::raw("'packing'"));
             })->
             where("output_defects_packing.defect_status", "defect")->
             where("output_defect_types.allocation", Auth::user()->Groupp)->
@@ -987,7 +987,7 @@ class DefectInOut extends Component
             leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects.defect_type_id")->
             leftJoin("output_defect_in_out", function($join) {
                 $join->on("output_defect_in_out.defect_id", "=", "output_defects.id");
-                $join->on("output_defect_in_out.output_type", "=", DB::raw("'packing'"));
+                $join->on("output_defect_in_out.output_type", "=", DB::raw("'qc'"));
             })->
             where("output_defects.defect_status", "defect")->
             where("output_defect_types.allocation", Auth::user()->Groupp)->
@@ -1019,11 +1019,7 @@ class DefectInOut extends Component
                 get()->
                 toArray();
 
-            $data = array_map(function ($value) {
-                return (array)$value;
-            }, $defectIn);
-
-            DefectInOutModel::insert($data);
+            DefectInOutModel::insert($defectIn);
 
             if (count($defectIn) > 0) {
                 $this->emit('alert', 'success', count($defectIn)." DEFECT berhasil di masuk ke '".Auth::user()->Groupp."'");
@@ -1120,11 +1116,8 @@ class DefectInOut extends Component
 
         if ($this->defectOutQtyModal > 0) {
             $defectOut = $defectOutQuery->
-                orderBy("master_plan.sewing_line")->
-                orderBy("master_plan.id_ws")->
-                orderBy("master_plan.color")->
-                orderBy("output_defect_types.defect_type")->
-                orderBy("output_defects.so_det_id")->
+                groupBy("output_defect_in.id")->
+                orderBy("output_defect_in.id")->
                 limit($this->defectOutQtyModal)->
                 pluck("id");
 
