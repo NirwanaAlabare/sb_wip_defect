@@ -22,9 +22,14 @@
                 <div class="card-header bg-defect">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="card-title text-light text-center fw-bold">{{ Auth::user()->Groupp." " }}DEFECT IN</h5>
-                        <button class="btn btn-dark float-end" wire:click="refreshComponent()">
-                            <i class="fa-solid fa-rotate"></i>
-                        </button>
+                        <div class="d-flex align-items-middle gap-3">
+                            <p class="text-light mb-0">
+                                Total : <b>{{ $totalDefectIn }}</b>
+                            </p>
+                            <button class="btn btn-dark float-end btn-sm" wire:click="refreshComponent()">
+                                <i class="fa-solid fa-rotate"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">
@@ -106,8 +111,16 @@
                     <div class="row g-3 mt-3">
                         <div class="table-responsive-md">
                             <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-10">
                                     <input type="text" class="form-control form-control-sm my-3" wire:model="defectInSearch" placeholder="Search...">
+                                </div>
+                                <div class="col-md-2">
+                                    <select class="form-select form-select-sm my-3" name="defectInShowPage" id="defect-in-show-page" wire:model="defectInShowPage">
+                                        <option value="10">Show 10</option>
+                                        <option value="25">Show 25</option>
+                                        <option value="50">Show 50</option>
+                                        <option value="100">Show 100</option>
+                                    </select>
                                 </div>
                                 <div class="col-md-3 d-none">
                                     <button type="button" class="btn btn-sm btn-defect w-100 my-3 fw-bold" wire:click="saveAllDefectIn">ALL DEFECT IN</button>
@@ -117,6 +130,7 @@
                                 <thead>
                                     <tr class="text-center align-middle">
                                         <th>No.</th>
+                                        <th>Waktu</th>
                                         <th>Line</th>
                                         <th>Master Plan</th>
                                         <th>Size</th>
@@ -145,6 +159,7 @@
                                             @endphp
                                             <tr class="text-center align-middle" wire:key='defect-in-{{ $defectIn->master_plan_id.'-'.$defectIn->defect_type_id.'-'.$defectIn->so_det_id }}'>
                                                 <td>{{ $defectInList->firstItem() + $loop->index }}</td>
+                                                <td>{{ $defectIn->defect_time }}</td>
                                                 <td>{{ strtoupper(str_replace("_", " ", $defectIn->sewing_line)) }}</td>
                                                 <td>{{ $defectIn->ws }}<br>{{ $defectIn->style }}<br>{{ $defectIn->color }}</td>
                                                 <td>{{ $defectIn->size }}</td>
@@ -237,9 +252,14 @@
                 <div class="card-header bg-rework">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="card-title text-light text-center fw-bold">{{ Auth::user()->Groupp." " }}DEFECT OUT</h5>
-                        <button class="btn btn-dark float-end" wire:click="refreshComponent()">
-                            <i class="fa-solid fa-rotate"></i>
-                        </button>
+                        <div class="d-flex align-items-middle gap-3">
+                            <p class="text-light mb-0">
+                                Total : <b>{{ $totalDefectOut }}</b>
+                            </p>
+                            <button class="btn btn-dark float-end btn-sm" wire:click="refreshComponent()">
+                                <i class="fa-solid fa-rotate"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">
@@ -321,8 +341,16 @@
                     <div class="row g-3 mt-3">
                         <div class="table-responsive-md">
                             <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-10">
                                     <input type="text" class="form-control form-control-sm my-3" wire:model="defectOutSearch" placeholder="Search...">
+                                </div>
+                                <div class="col-md-2">
+                                    <select class="form-select form-select-sm my-3" name="defectOutShowPage" id="defect-out-show-page" wire:model="defectOutShowPage">
+                                        <option value="10">Show 10</option>
+                                        <option value="25">Show 25</option>
+                                        <option value="50">Show 50</option>
+                                        <option value="100">Show 100</option>
+                                    </select>
                                 </div>
                                 <div class="col-md-3 d-none">
                                     <button type="button" class="btn btn-sm btn-rework w-100 my-3 fw-bold" wire:click="saveAllDefectOut">ALL DEFECT OUT</button>
@@ -332,6 +360,7 @@
                                 <thead>
                                     <tr class="text-center align-middle">
                                         <th>No.</th>
+                                        <th>Waktu</th>
                                         <th>Line</th>
                                         <th>Master Plan</th>
                                         <th>Size</th>
@@ -360,6 +389,7 @@
                                             @endphp
                                             <tr class="text-center align-middle" wire:key='defect-out-{{ $defectOut->master_plan_id.'-'.$defectOut->defect_type_id.'-'.$defectOut->so_det_id.'-'.$defectOut->output_type }}'>
                                                 <td>{{ $defectOutList->firstItem() + $loop->index }}</td>
+                                                <td>{{ $defectOut->defect_time }}</td>
                                                 <td>{{ strtoupper(str_replace("_", " ", $defectOut->sewing_line)) }}</td>
                                                 <td>{{ $defectOut->ws }}<br>{{ $defectOut->style }}<br>{{ $defectOut->color }}</td>
                                                 <td>{{ $defectOut->size }}</td>
@@ -462,8 +492,16 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-10">
                             <input type="text" class="form-control form-control-sm my-3" wire:model="defectInOutSearch" placeholder="Search...">
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select form-select-sm my-3" name="defectInOutShowPage" id="defect-in-out-show-page" wire:model="defectInOutShowPage">
+                                <option value="10">Show 10</option>
+                                <option value="25">Show 25</option>
+                                <option value="50">Show 50</option>
+                                <option value="100">Show 100</option>
+                            </select>
                         </div>
                         <div class="col-md-3 d-none">
                             <button type="button" class="btn btn-sm btn-rework w-100 my-3 fw-bold" wire:click="saveAllDefectIn">ALL DEFECT OUT</button>
