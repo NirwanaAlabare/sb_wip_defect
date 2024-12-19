@@ -28,6 +28,11 @@ class Defect extends Model
         'updated_at',
     ];
 
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
+    ];
+
     public function masterPlan()
     {
         return $this->belongsTo(MasterPlan::class, 'master_plan_id', 'id');

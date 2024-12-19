@@ -26,6 +26,11 @@ class DefectInOut extends Model
         'reworked_at'
     ];
 
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
+    ];
+
     public function defect()
     {
         return $this->hasOne(Defect::class, 'id', 'defect_id');
