@@ -144,7 +144,7 @@
                                 <tbody>
                                     @if (count($defectInList) < 1)
                                         <tr class="text-center align-middle">
-                                            <td colspan="9" class="text-center">Data tidak ditemukan</td>
+                                            <td colspan="10" class="text-center">Data tidak ditemukan</td>
                                         </tr>
                                     @else
                                         @foreach ($defectInList as $defectIn)
@@ -374,7 +374,7 @@
                                 <tbody>
                                     @if (count($defectOutList) < 1)
                                         <tr class="text-center align-middle">
-                                            <td colspan="9" class="text-center">Data tidak ditemukan</td>
+                                            <td colspan="10" class="text-center">Data tidak ditemukan</td>
                                         </tr>
                                     @else
                                         @foreach ($defectOutList as $defectOut)
