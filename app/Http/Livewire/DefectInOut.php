@@ -1205,7 +1205,8 @@ class DefectInOut extends Component
             whereNotNull("master_plan.id")->
             where("output_defects_packing.defect_status", "defect")->
             where("output_defect_types.allocation", Auth::user()->Groupp)->
-            whereNull("output_defect_in_out.id");
+            whereNull("output_defect_in_out.id")->
+            whereRaw("YEAR(output_defects_packing.updated_at) = '".date("Y")."'");
             if ($this->defectInSearch) {
                 $defectInQuery->whereRaw("(
                     master_plan.tgl_plan LIKE '%".$this->defectInSearch."%' OR
@@ -1233,7 +1234,7 @@ class DefectInOut extends Component
                 $defectInQuery->where("output_defects_packing.defect_type_id", $this->defectInSelectedType);
             }
             $defectIn = $defectInQuery->
-                groupBy("master_plan.sewing_line", "master_plan.id", "output_defect_types.id", "output_defects_packing.so_det_id");
+                groupBy("master_plan.sewing_line", "master_plan.id", "output_defect_types.id", "output_defects_packing.so_det_id", "output_defects_packing.updated_at");
         } else {
             $defectInQuery = Defect::selectRaw("
                 master_plan.id master_plan_id,
@@ -1261,7 +1262,8 @@ class DefectInOut extends Component
             whereNotNull("master_plan.id")->
             where("output_defects.defect_status", "defect")->
             where("output_defect_types.allocation", Auth::user()->Groupp)->
-            whereNull("output_defect_in_out.id");
+            whereNull("output_defect_in_out.id")->
+            whereRaw("YEAR(output_defects.updated_at) = '".date("Y")."'");
             if ($this->defectInSearch) {
                 $defectInQuery->whereRaw("(
                     master_plan.tgl_plan LIKE '%".$this->defectInSearch."%' OR
@@ -1289,7 +1291,7 @@ class DefectInOut extends Component
                 $defectInQuery->where("output_defects.defect_type_id", $this->defectInSelectedType);
             }
             $defectIn = $defectInQuery->
-                groupBy("master_plan.sewing_line", "master_plan.id", "output_defect_types.id", "output_defects.so_det_id");
+                groupBy("master_plan.sewing_line", "master_plan.id", "output_defect_types.id", "output_defects.so_det_id", "output_defects.updated_at");
         }
 
         $defectInTotal = $defectIn->get()->sum("defect_qty");
@@ -1326,7 +1328,8 @@ class DefectInOut extends Component
         where("output_defect_types.allocation", Auth::user()->Groupp)->
         where("output_defect_in_out.status", "defect")->
         where("output_defect_in_out.output_type", $this->defectOutOutputType)->
-        where("output_defect_in_out.type", Auth::user()->Groupp);
+        where("output_defect_in_out.type", Auth::user()->Groupp)->
+        whereRaw("YEAR(output_defect_in_out.updated_at) = '".date("Y")."'");
         if ($this->defectOutSearch) {
             $defectOutQuery->whereRaw("(
                 master_plan.tgl_plan LIKE '%".$this->defectOutSearch."%' OR
@@ -1357,7 +1360,7 @@ class DefectInOut extends Component
         $defectOutTotal = $defectOutQuery->get()->sum("defect_qty");
 
         $defectOutList = $defectOutQuery->
-            groupBy("master_plan.sewing_line", "master_plan.id", "output_defect_types.id", "output_defects.so_det_id", "output_defect_in_out.output_type")->
+            groupBy("master_plan.sewing_line", "master_plan.id", "output_defect_types.id", "output_defects.so_det_id", "output_defect_in_out.output_type", "output_defect_in_out.updated_at")->
             orderBy("output_defect_in_out.updated_at", "desc")->
             orderBy("master_plan.sewing_line")->
             orderBy("master_plan.id_ws")->
