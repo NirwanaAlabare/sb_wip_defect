@@ -1189,7 +1189,7 @@ class DefectInOut extends Component
                 output_defects_packing.defect_type_id,
                 output_defect_types.defect_type,
                 output_defects_packing.so_det_id,
-                output_defects_packing.updated_at as defect_time,
+                MAX(output_defects_packing.updated_at) as defect_time,
                 so_det.size,
                 'packing' output_type,
                 COUNT(output_defects_packing.id) defect_qty
@@ -1246,7 +1246,7 @@ class DefectInOut extends Component
                 output_defects.defect_type_id,
                 output_defect_types.defect_type,
                 output_defects.so_det_id,
-                output_defects.updated_at as defect_time,
+                MAX(output_defects.updated_at) as defect_time,
                 so_det.size,
                 'qc' output_type,
                 COUNT(output_defects.id) defect_qty
@@ -1316,7 +1316,7 @@ class DefectInOut extends Component
             output_defect_types.defect_type,
             output_defects.so_det_id,
             output_defect_in_out.output_type,
-            output_defect_in_out.updated_at as defect_time,
+            MAX(output_defect_in_out.updated_at) as defect_time,
             so_det.size,
             COUNT(output_defect_in_out.id) defect_qty
         ")->
