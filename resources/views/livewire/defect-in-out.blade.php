@@ -368,7 +368,7 @@
                                         <th>Dept.</th>
                                         <th>Output</th>
                                         <th><input class="form-check-input" type="checkbox" value="" id="defect-out-select-all" onchange="defectOutSelectAll(this)" style="scale: 1.3"></th>
-                                        <th>IN</th>
+                                        <th>OUT</th>
                                     </tr>
                                 </thead>
                                 <tbody>
