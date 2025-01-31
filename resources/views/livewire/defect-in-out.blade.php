@@ -137,7 +137,7 @@
                                         <th>Type</th>
                                         <th>Qty</th>
                                         <th>Dept.</th>
-                                        <th><input class="form-check-input" type="checkbox" value="" id="defect-in-select-all" onclick="defectInSelectAll(this)" style="scale: 1.3"></th>
+                                        <th class="d-none"><input class="form-check-input" type="checkbox" value="" id="defect-in-select-all" onclick="defectInSelectAll(this)" style="scale: 1.3"></th>
                                         <th>IN</th>
                                     </tr>
                                 </thead>
@@ -166,7 +166,7 @@
                                                 <td>{{ $defectIn->defect_type }}</td>
                                                 <td>{{ $defectIn->defect_qty }}</td>
                                                 <td class="fw-bold {{ $defectIn->output_type == 'qc' ? 'text-danger' : 'text-success'  }}">{{ strtoupper($defectIn->output_type) }}</td>
-                                                <td><input class="form-check-input" type="checkbox" value="{{ $defectIn->master_plan_id.'-'.$defectIn->defect_type_id.'-'.$defectIn->so_det_id.'-'.$defectIn->output_type }}" style="scale: 1.3" {{ $thisDefectInChecked && $thisDefectInChecked->count() > 0 ? "checked" : ""  }} onchange="defectInCheck(this)"></td>
+                                                <td class="d-none"><input class="form-check-input" type="checkbox" value="{{ $defectIn->master_plan_id.'-'.$defectIn->defect_type_id.'-'.$defectIn->so_det_id.'-'.$defectIn->output_type }}" style="scale: 1.3" {{ $thisDefectInChecked && $thisDefectInChecked->count() > 0 ? "checked" : ""  }} onchange="defectInCheck(this)"></td>
                                                 <td><button class="btn btn-sm btn-defect fw-bold" wire:click='preSaveSelectedDefectIn("{{ $defectIn->master_plan_id.'-'.$defectIn->defect_type_id.'-'.$defectIn->so_det_id.'-'.$defectIn->output_type }}")'>IN</button></td>
                                             </tr>
                                         @endforeach
@@ -280,6 +280,7 @@
                                     @endforeach
                                 </select>
                             </div>
+                            <input type="text" wire:model="defectOutLine">
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3" wire:ignore>
@@ -365,9 +366,9 @@
                                         <th>Master Plan</th>
                                         <th>Size</th>
                                         <th>Type</th>
+                                        <th>Qty</th>
                                         <th>Dept.</th>
-                                        <th>Output</th>
-                                        <th><input class="form-check-input" type="checkbox" value="" id="defect-out-select-all" onchange="defectOutSelectAll(this)" style="scale: 1.3"></th>
+                                        <th class="d-none"><input class="form-check-input" type="checkbox" value="" id="defect-out-select-all" onchange="defectOutSelectAll(this)" style="scale: 1.3"></th>
                                         <th>OUT</th>
                                     </tr>
                                 </thead>
@@ -396,7 +397,7 @@
                                                 <td>{{ $defectOut->defect_type }}</td>
                                                 <td>{{ $defectOut->defect_qty }}</td>
                                                 <td class="fw-bold {{ $defectOut->output_type == "qc" ? "text-danger" : "text-success" }}">{{ strtoupper($defectOut->output_type) }}</td>
-                                                <td><input class="form-check-input" type="checkbox" value="{{ $defectOut->master_plan_id.'-'.$defectOut->defect_type_id.'-'.$defectOut->so_det_id.'-'.$defectOut->so_det_id }}" style="scale: 1.3" {{ $thisDefectOutChecked && $thisDefectOutChecked->count() > 0 ? "checked" : ""  }} onchange="defectOutCheck(this)"></td>
+                                                <td class="d-none"><input class="form-check-input" type="checkbox" value="{{ $defectOut->master_plan_id.'-'.$defectOut->defect_type_id.'-'.$defectOut->so_det_id.'-'.$defectOut->so_det_id }}" style="scale: 1.3" {{ $thisDefectOutChecked && $thisDefectOutChecked->count() > 0 ? "checked" : ""  }} onchange="defectOutCheck(this)"></td>
                                                 <td><button class="btn btn-sm btn-rework fw-bold" wire:click="preSaveSelectedDefectOut('{{ $defectOut->master_plan_id.'-'.$defectOut->defect_type_id.'-'.$defectOut->so_det_id.'-'.$defectOut->output_type }}')">OUT</button></td>
                                             </tr>
                                         @endforeach

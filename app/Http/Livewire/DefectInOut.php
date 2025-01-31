@@ -1320,7 +1320,7 @@ class DefectInOut extends Component
             so_det.size,
             COUNT(output_defect_in_out.id) defect_qty
         ")->
-        leftJoin("output_defects".($this->defectOutOutputType == 'packing' ? '_packing' : '')." as output_defects", "output_defects.id", "=", "output_defect_in_out.defect_id")->
+        leftJoin(DB::raw("output_defects".($this->defectOutOutputType == 'packing' ? '_packing' : '')." as output_defects"), "output_defects.id", "=", "output_defect_in_out.defect_id")->
         leftJoin("so_det", "so_det.id", "=", "output_defects.so_det_id")->
         leftJoin("master_plan", "master_plan.id", "=", "output_defects.master_plan_id")->
         leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
@@ -1345,7 +1345,7 @@ class DefectInOut extends Component
         //     $defectOutQuery->whereBetween("output_defect_in_out.updated_at", [$this->defectOutDate." 00:00:00", $this->defectOutDate." 23:59:59"]);
         // }
         if ($this->defectOutLine) {
-            $defectInQuery->where("master_plan.sewing_line", $this->defectOutLine);
+            $defectOutQuery->where("master_plan.sewing_line", $this->defectOutLine);
         }
         if ($this->defectOutSelectedMasterPlan) {
             $defectOutQuery->where("master_plan.id", $this->defectOutSelectedMasterPlan);
@@ -1357,10 +1357,11 @@ class DefectInOut extends Component
             $defectOutQuery->where("output_defects.defect_type_id", $this->defectOutSelectedType);
         }
 
-        $defectOutTotal = $defectOutQuery->get()->sum("defect_qty");
+        $defectOut = $defectOutQuery->groupBy("master_plan.sewing_line", "master_plan.id", "output_defect_types.id", "output_defects.so_det_id", "output_defect_in_out.output_type", "output_defect_in_out.updated_at");
 
-        $defectOutList = $defectOutQuery->
-            groupBy("master_plan.sewing_line", "master_plan.id", "output_defect_types.id", "output_defects.so_det_id", "output_defect_in_out.output_type", "output_defect_in_out.updated_at")->
+        $defectOutTotal = $defectOut->get()->sum("defect_qty");
+
+        $defectOutList = $defectOut->
             orderBy("output_defect_in_out.updated_at", "desc")->
             orderBy("master_plan.sewing_line")->
             orderBy("master_plan.id_ws")->
