@@ -280,7 +280,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <input type="text" wire:model="defectOutLine">
+                            <input type="text" class="d-none" wire:model="defectOutLine">
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3" wire:ignore>
@@ -549,14 +549,14 @@
                                             }
 
                                             if (
-                                                str_contains(strtolower($currentDefect->kode_numbering), strtolower($defectInOutSearch)) ||
-                                                str_contains(strtolower($currentDefect->soDet->so->actCosting->kpno), strtolower($defectInOutSearch)) ||
-                                                str_contains(strtolower($currentDefect->soDet->so->actCosting->styleno), strtolower($defectInOutSearch)) ||
-                                                str_contains(strtolower($currentDefect->soDet->color), strtolower($defectInOutSearch)) ||
-                                                str_contains(strtolower($currentDefect->soDet->size), strtolower($defectInOutSearch)) ||
-                                                str_contains(strtolower($currentDefect->defectType->defect_type), strtolower($defectInOutSearch)) ||
-                                                str_contains(strtolower($currentDefect->defectArea->defect_area), strtolower($defectInOutSearch)) ||
-                                                str_contains(strtolower(str_replace("_", " ", $currentDefect->masterPlan->sewing_line)), strtolower($defectInOutSearch)) ||
+                                                str_contains(strtolower($currentDefect ? $currentDefect->kode_numbering : ''), strtolower($defectInOutSearch)) ||
+                                                str_contains(strtolower($currentDefect ? $currentDefect->soDet->so->actCosting->kpno : ''), strtolower($defectInOutSearch)) ||
+                                                str_contains(strtolower($currentDefect ? $currentDefect->soDet->so->actCosting->styleno : ''), strtolower($defectInOutSearch)) ||
+                                                str_contains(strtolower($currentDefect ? $currentDefect->soDet->color : ''), strtolower($defectInOutSearch)) ||
+                                                str_contains(strtolower($currentDefect ? $currentDefect->soDet->size : ''), strtolower($defectInOutSearch)) ||
+                                                str_contains(strtolower($currentDefect ? $currentDefect->defectType->defect_type : ''), strtolower($defectInOutSearch)) ||
+                                                str_contains(strtolower($currentDefect ? $currentDefect->defectArea->defect_area : ''), strtolower($defectInOutSearch)) ||
+                                                str_contains(strtolower(str_replace("_", " ", $currentDefect ? $currentDefect->masterPlan->sewing_line : '')), strtolower($defectInOutSearch)) ||
                                                 str_contains(strtolower($defectInOut->status == "reworked" ? "DONE" : 'PROCESS'), strtolower($defectInOutSearch)) ||
                                                 str_contains(strtolower($defectInOut->output_type), strtolower($defectInOutSearch))
                                             ) {
@@ -570,16 +570,16 @@
                                                 <td class="text-nowrap">{{ $defectInOut->created_at ? date('H:i:s', strtotime($defectInOut->created_at)) : '' }}</td>
                                                 <td class="text-nowrap">{{ $defectInOut->reworked_at ? date('Y-m-d', strtotime($defectInOut->reworked_at)) : '' }}</td>
                                                 <td class="text-nowrap">{{ $defectInOut->reworked_at ? date('H:i:s', strtotime($defectInOut->reworked_at)) : '' }}</td>
-                                                <td class="text-nowrap">{{ strtoupper(str_replace("_", " ", $currentDefect->masterPlan->sewing_line)) }}</td>
+                                                <td class="text-nowrap">{{ strtoupper(str_replace("_", " " ,$currentDefect ? $currentDefect->masterPlan->sewing_line : '')) }}</td>
                                                 <td class="text-nowrap fw-bold {{ $defectInOut->output_type == 'qc' ? 'text-danger' : 'text-success' }}">{{ strtoupper($defectInOut->output_type) }}</td>
-                                                <td class="text-nowrap">{{ $currentDefect->kode_numbering }}</td>
-                                                <td class="text-nowrap">{{ $currentDefect->soDet->so->actCosting->kpno }}</td>
-                                                <td class="text-nowrap">{{ $currentDefect->soDet->so->actCosting->styleno }}</td>
-                                                <td class="text-nowrap">{{ $currentDefect->soDet->color }}</td>
-                                                <td class="text-nowrap">{{ $currentDefect->soDet->size }}</td>
-                                                <td class="text-nowrap">{{ $currentDefect->defectType->defect_type }}</td>
-                                                <td class="text-nowrap">{{ $currentDefect->defectArea->defect_area }}</td>
-                                                <td class="text-nowrap"><button class="btn btn-dark" wire:click="showDefectAreaImage('{{$currentDefect->masterPlan->gambar}}', {{$currentDefect->defect_area_x}}, {{$currentDefect->defect_area_y}})"><i class="fa fa-image"></i></button></td>
+                                                <td class="text-nowrap">{{ $currentDefect ? $currentDefect->kode_numbering : '' }}</td>
+                                                <td class="text-nowrap">{{ $currentDefect ? $currentDefect->soDet->so->actCosting->kpno : '' }}</td>
+                                                <td class="text-nowrap">{{ $currentDefect ? $currentDefect->soDet->so->actCosting->styleno : '' }}</td>
+                                                <td class="text-nowrap">{{ $currentDefect ? $currentDefect->soDet->color : '' }}</td>
+                                                <td class="text-nowrap">{{ $currentDefect ? $currentDefect->soDet->size : '' }}</td>
+                                                <td class="text-nowrap">{{ $currentDefect ? $currentDefect->defectType->defect_type : '' }}</td>
+                                                <td class="text-nowrap">{{ $currentDefect ? $currentDefect->defectArea->defect_area : '' }}</td>
+                                                <td class="text-nowrap"><button class="btn btn-dark" wire:click="showDefectAreaImage('{{$currentDefect ? $currentDefect->masterPlan->gambar : ''}}', {{$currentDefect ? $currentDefect->defect_area_x : ''}}, {{$currentDefect ? $currentDefect->defect_area_y : ''}})"><i class="fa fa-image"></i></button></td>
                                                 <td class="text-nowrap">{{ $defectInOut->status == "reworked" ? "DONE" : ($defectInOut->status == "defect" ? "PROCESS" : '-') }}</td>
                                             </tr>
                                         @endif
