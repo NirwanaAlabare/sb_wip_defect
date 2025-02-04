@@ -44,13 +44,21 @@ html, body {
     transition: 0.3s;
 }
 
+table.dataTable {
+    border-collapse: collapse !important;
+}
+
+table.dataTable tbody, td, tfoot, th, thead, tr {
+    border-width: 1px;
+}
+
 .pagination .page-item > .page-link {
-    color: #212529 !important;
+    color: #6531a0 !important;
 }
 
 .pagination .page-item.active > .page-link {
-    background-color: #212529 !important;
-    border-color: #212529 !important;
+    background-color: #6531a0 !important;
+    border-color: #6531a0 !important;
     color: #fbfbfb !important;
 }
 

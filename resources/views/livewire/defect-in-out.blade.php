@@ -17,7 +17,7 @@
         </div>
 
         {{-- Defect IN --}}
-        <div class="col-12 col-md-12 {{ $mode != "in" ? 'd-none' : ''}}" wire:poll.30000ms>
+        <div class="col-12 col-md-12 {{ $mode != "in" ? 'd-none' : ''}}">
             <div class="card">
                 <div class="card-header bg-defect">
                     <div class="d-flex justify-content-between align-items-center">
@@ -109,8 +109,8 @@
                         </div>
                     </div>
                     <div class="row g-3 mt-3">
-                        <div class="table-responsive-md">
-                            <div class="row">
+                        <div class="table-responsive p-3" style="max-height: 500px; overflow: auto;">
+                            {{-- <div class="row">
                                 <div class="col-md-10">
                                     <input type="text" class="form-control form-control-sm my-3" wire:model="defectInSearch" placeholder="Search...">
                                 </div>
@@ -125,7 +125,7 @@
                                 <div class="col-md-3 d-none">
                                     <button type="button" class="btn btn-sm btn-defect w-100 my-3 fw-bold" wire:click="saveAllDefectIn">ALL DEFECT IN</button>
                                 </div>
-                            </div>
+                            </div> --}}
                             <table class="table table-sm table-bordered w-100">
                                 <thead>
                                     <tr class="text-center align-middle">
@@ -157,8 +157,8 @@
                                                     });
                                                 }
                                             @endphp
-                                            <tr class="text-center align-middle" wire:key='defect-in-{{ $defectIn->master_plan_id.'-'.$defectIn->defect_type_id.'-'.$defectIn->so_det_id }}'>
-                                                <td>{{ $defectInList->firstItem() + $loop->index }}</td>
+                                            <tr class="text-center align-middle">
+                                                <td>{{ $loop->index+1 }}</td>
                                                 <td>{{ $defectIn->defect_time }}</td>
                                                 <td>{{ strtoupper(str_replace("_", " ", $defectIn->sewing_line)) }}</td>
                                                 <td>{{ $defectIn->ws }}<br>{{ $defectIn->style }}<br>{{ $defectIn->color }}</td>
@@ -173,11 +173,10 @@
                                     @endif
                                 </tbody>
                             </table>
-                            {{ $defectInList->links() }}
-                            <div class="row justify-content-end mt-3">
-                                <div class="col-md-3">
-                                    <button class="btn btn-defect btn-sm fw-bold w-100" wire:click='saveCheckedDefectIn()'>CHECKED DEFECT IN</button>
-                                </div>
+                        </div>
+                        <div class="row justify-content-end mt-3">
+                            <div class="col-md-3">
+                                <button class="btn btn-defect btn-sm fw-bold w-100" wire:click='saveCheckedDefectIn()'>CHECKED DEFECT IN</button>
                             </div>
                         </div>
                     </div>
@@ -247,7 +246,7 @@
         </div>
 
         {{-- Defect OUT --}}
-        <div class="col-12 col-md-12 {{ $mode != "out" ? 'd-none' : ''}}" wire:poll.30000ms>
+        <div class="col-12 col-md-12 {{ $mode != "out" ? 'd-none' : ''}}">
             <div class="card">
                 <div class="card-header bg-rework">
                     <div class="d-flex justify-content-between align-items-center">
@@ -284,7 +283,7 @@
                         <div class="col-md-4">
                             <div class="mb-3" wire:ignore>
                                 <label class="form-label fw-bold">Department</label>
-                                <select class="form-select" id="select-defect-in-output" wire:model="defectOutOutputType">
+                                <select class="form-select" id="select-defect-out-output" wire:model="defectOutOutputType">
                                     <option value="qc">QC</option>
                                     <option value="packing">PACKING</option>
                                 </select>
@@ -339,8 +338,8 @@
                         </div>
                     </div>
                     <div class="row g-3 mt-3">
-                        <div class="table-responsive-md">
-                            <div class="row">
+                        <div class="table-responsive p-3" style="max-height: 500px; overflow: auto;">
+                            {{-- <div class="row">
                                 <div class="col-md-10">
                                     <input type="text" class="form-control form-control-sm my-3" wire:model="defectOutSearch" placeholder="Search...">
                                 </div>
@@ -355,7 +354,7 @@
                                 <div class="col-md-3 d-none">
                                     <button type="button" class="btn btn-sm btn-rework w-100 my-3 fw-bold" wire:click="saveAllDefectOut">ALL DEFECT OUT</button>
                                 </div>
-                            </div>
+                            </div> --}}
                             <table class="table table-sm table-bordered w-100">
                                 <thead>
                                     <tr class="text-center align-middle">
@@ -387,8 +386,8 @@
                                                     });
                                                 }
                                             @endphp
-                                            <tr class="text-center align-middle" wire:key='defect-out-{{ $defectOut->master_plan_id.'-'.$defectOut->defect_type_id.'-'.$defectOut->so_det_id.'-'.$defectOut->output_type }}'>
-                                                <td>{{ $defectOutList->firstItem() + $loop->index }}</td>
+                                            <tr class="text-center align-middle">
+                                                <td>{{ $loop->index+1 }}</td>
                                                 <td>{{ $defectOut->defect_time }}</td>
                                                 <td>{{ strtoupper(str_replace("_", " ", $defectOut->sewing_line)) }}</td>
                                                 <td>{{ $defectOut->ws }}<br>{{ $defectOut->style }}<br>{{ $defectOut->color }}</td>
@@ -403,11 +402,10 @@
                                     @endif
                                 </tbody>
                             </table>
-                            {{ $defectOutList->links() }}
-                            <div class="row justify-content-end mt-3">
-                                <div class="col-md-3">
-                                    <button class="btn btn-rework btn-sm fw-bold w-100" wire:click='saveCheckedDefectOut()'>CHECKED DEFECT OUT</button>
-                                </div>
+                        </div>
+                        <div class="row justify-content-end mt-3">
+                            <div class="col-md-3">
+                                <button class="btn btn-rework btn-sm fw-bold w-100" wire:click='saveCheckedDefectOut()'>CHECKED DEFECT OUT</button>
                             </div>
                         </div>
                     </div>
@@ -477,7 +475,7 @@
         </div>
 
         {{-- All Defect --}}
-        <div class="col-12 col-md-12 {{ $mode != "in-out" ? 'd-none' : ''}}" wire:poll.30000ms>
+        <div class="col-12 col-md-12 {{ $mode != "in-out" ? 'd-none' : ''}}">
             <div class="card">
                 <div class="card-header bg-sb">
                     <div class="d-flex justify-content-between align-items-center">
@@ -491,102 +489,21 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-10">
-                            <input type="text" class="form-control form-control-sm my-3" wire:model="defectInOutSearch" placeholder="Search...">
-                        </div>
-                        <div class="col-md-2">
-                            <select class="form-select form-select-sm my-3" name="defectInOutShowPage" id="defect-in-out-show-page" wire:model="defectInOutShowPage">
-                                <option value="10">Show 10</option>
-                                <option value="25">Show 25</option>
-                                <option value="50">Show 50</option>
-                                <option value="100">Show 100</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3 d-none">
-                            <button type="button" class="btn btn-sm btn-rework w-100 my-3 fw-bold" wire:click="saveAllDefectIn">ALL DEFECT OUT</button>
-                        </div>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-sm table-bordered w-100">
-                            <thead>
-                                <tr class="text-center align-middle">
-                                    <th>No.</th>
-                                    <th>Date IN</th>
-                                    <th>Time IN</th>
-                                    <th>Date OUT</th>
-                                    <th>Time OUT</th>
-                                    <th>Line</th>
-                                    <th>Department</th>
-                                    <th>QR</th>
-                                    <th>No. WS</th>
-                                    <th>Style</th>
-                                    <th>Color</th>
-                                    <th>Size</th>
-                                    <th>Type</th>
-                                    <th>Area</th>
-                                    <th>Image</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if ($defectInOutList->count() < 1)
-                                    <tr class="text-center align-middle">
-                                        <td colspan="16" class="text-center">Data tidak ditemukan</td>
+                    <div>
+                        <div class="table-responsive" wire:ignore>
+                            <table class="table table-bordered w-100" id="defect-in-out-table" >
+                                <thead>
+                                    <tr>
+                                        <th>Action</th>
+                                        <th>Date</th>
+                                        <th>Total IN</th>
+                                        <th>Total PROCESS</th>
+                                        <th>Total OUT</th>
                                     </tr>
-                                @else
-                                    @foreach ($defectInOutList as $defectInOut)
-                                        @php
-                                            $show = false;
-
-                                            $currentDefect = null;
-
-                                            if ($defectInOut->output_type == "packing") {
-                                                $currentDefect = $defectInOut->defectPacking;
-                                            } else {
-                                                $currentDefect = $defectInOut->defect;
-                                            }
-
-                                            if (
-                                                str_contains(strtolower($currentDefect->kode_numbering), strtolower($defectInOutSearch)) ||
-                                                str_contains(strtolower($currentDefect->soDet->so->actCosting->kpno), strtolower($defectInOutSearch)) ||
-                                                str_contains(strtolower($currentDefect->soDet->so->actCosting->styleno), strtolower($defectInOutSearch)) ||
-                                                str_contains(strtolower($currentDefect->soDet->color), strtolower($defectInOutSearch)) ||
-                                                str_contains(strtolower($currentDefect->soDet->size), strtolower($defectInOutSearch)) ||
-                                                str_contains(strtolower($currentDefect->defectType->defect_type), strtolower($defectInOutSearch)) ||
-                                                str_contains(strtolower($currentDefect->defectArea->defect_area), strtolower($defectInOutSearch)) ||
-                                                str_contains(strtolower(str_replace("_", " ", $currentDefect->masterPlan->sewing_line)), strtolower($defectInOutSearch)) ||
-                                                str_contains(strtolower($defectInOut->status == "reworked" ? "DONE" : 'PROCESS'), strtolower($defectInOutSearch)) ||
-                                                str_contains(strtolower($defectInOut->output_type), strtolower($defectInOutSearch))
-                                            ) {
-                                                $show = true;
-                                            }
-                                        @endphp
-                                        @if ($show)
-                                            <tr class="text-center align-middle">
-                                                <td class="text-nowrap">{{ $defectInOutList->firstItem() + $loop->index }}</td>
-                                                <td class="text-nowrap">{{ $defectInOut->created_at ? date('Y-m-d', strtotime($defectInOut->created_at)) : '' }}</td>
-                                                <td class="text-nowrap">{{ $defectInOut->created_at ? date('H:i:s', strtotime($defectInOut->created_at)) : '' }}</td>
-                                                <td class="text-nowrap">{{ $defectInOut->reworked_at ? date('Y-m-d', strtotime($defectInOut->reworked_at)) : '' }}</td>
-                                                <td class="text-nowrap">{{ $defectInOut->reworked_at ? date('H:i:s', strtotime($defectInOut->reworked_at)) : '' }}</td>
-                                                <td class="text-nowrap">{{ strtoupper(str_replace("_", " ", $currentDefect->masterPlan->sewing_line)) }}</td>
-                                                <td class="text-nowrap fw-bold {{ $defectInOut->output_type == 'qc' ? 'text-danger' : 'text-success' }}">{{ strtoupper($defectInOut->output_type) }}</td>
-                                                <td class="text-nowrap">{{ $currentDefect->kode_numbering }}</td>
-                                                <td class="text-nowrap">{{ $currentDefect->soDet->so->actCosting->kpno }}</td>
-                                                <td class="text-nowrap">{{ $currentDefect->soDet->so->actCosting->styleno }}</td>
-                                                <td class="text-nowrap">{{ $currentDefect->soDet->color }}</td>
-                                                <td class="text-nowrap">{{ $currentDefect->soDet->size }}</td>
-                                                <td class="text-nowrap">{{ $currentDefect->defectType->defect_type }}</td>
-                                                <td class="text-nowrap">{{ $currentDefect->defectArea->defect_area }}</td>
-                                                <td class="text-nowrap"><button class="btn btn-dark" wire:click="showDefectAreaImage('{{$currentDefect->masterPlan->gambar}}', {{$currentDefect->defect_area_x}}, {{$currentDefect->defect_area_y}})"><i class="fa fa-image"></i></button></td>
-                                                <td class="text-nowrap">{{ $defectInOut->status == "reworked" ? "DONE" : ($defectInOut->status == "defect" ? "PROCESS" : '-') }}</td>
-                                            </tr>
-                                        @endif
-                                    @endforeach
-                                @endif
-                            </tbody>
-                        </table>
-                        {{ $defectInOutList->links() }}
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -605,9 +522,74 @@
             </div>
         </div>
     </div>
+
+    {{-- Defect In Out Detail Modal --}}
+    <div class="modal" tabindex="-1" id="defect-in-out-modal" wire:ignore>
+        <div class="modal-dialog modal-dialog-scrollable modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header bg-sb text-light fw-bold">
+                    <h5 class="modal-title">Defect In Out</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Tanggal</label>
+                                <input type="text" class="form-control" id="defectInOutDetailDate" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Total</label>
+                                <input type="text" class="form-control" id="defectInOutDetailQty" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="table-responsive">
+                                <table class="table table-bordered w-100" id="defect-in-out-detail-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Time IN</th>
+                                            <th>Time OUT</th>
+                                            <th>Line</th>
+                                            <th>Dept.</th>
+                                            <th>QR</th>
+                                            <th>No. WS</th>
+                                            <th>Style</th>
+                                            <th>Color</th>
+                                            <th>Size</th>
+                                            <th>Type</th>
+                                            <th>Area</th>
+                                            <th>Image</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @push('scripts')
+    <!-- DataTables -->
+    <link rel="stylesheet" href="{{ asset('datatables/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('datatables/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('datatables/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('datatables/datatables-rowgroup/css/rowGroup.bootstrap4.min.css') }}">
+
+    {{-- DataTables --}}
+    <script src="{{ asset('datatables/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('datatables/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+    <script src="{{ asset('datatables/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
+    <script src="{{ asset('datatables/datatables-responsive/js/responsive.bootstrap4.min.js') }}"></script>
+
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             $('.select2').select2({
@@ -617,29 +599,25 @@
             });
 
             $('#select-defect-in-line').on('change', function (e) {
-                Livewire.emit("loadingStart");
-
                 let selectedDefectInLine = $('#select-defect-in-line').val();
 
                 @this.set('defectInLine', selectedDefectInLine);
 
-                getMasterPlanData();
+                // getMasterPlanData();
 
-                getDefectType();
-                getDefectArea();
+                // getDefectType();
+                // getDefectArea();
             });
 
             $('#select-defect-out-line').on('change', function (e) {
-                Livewire.emit("loadingStart");
-
                 let selectedDefectOutLine = $('#select-defect-out-line').val();
 
                 @this.set('defectOutLine', selectedDefectOutLine);
 
-                getMasterPlanData("out");
+                // getMasterPlanData("out");
 
-                getDefectType("out");
-                getDefectArea("out");
+                // getDefectType("out");
+                // getDefectArea("out");
             });
 
             $('#select-defect-in-master-plan').on('change', function (e) {
@@ -729,6 +707,46 @@
 
                 getDefectType("out");
             });
+        });
+
+        let defectInOutDatatable = $("#defect-in-out-table").DataTable({
+            serverSide: true,
+            processing: true,
+            ordering: false,
+            pageLength: 50,
+            ajax: {
+                url: '{{ route('get-defect-in-out-daily') }}',
+                dataType: 'json',
+            },
+            columns: [
+                {
+                    data: 'tanggal',
+                },
+                {
+                    data: 'tanggal',
+                },
+                {
+                    data: 'total_in',
+                },
+                {
+                    data: 'total_process',
+                },
+                {
+                    data: 'total_out',
+                }
+            ],
+            columnDefs: [
+                {
+                    targets: [0],
+                    render: (data, type, row, meta) => {
+                        return `<button type='button' class='btn btn-sb-secondary btn-sm' onclick='getDefectInOutDetail("`+data+`")'><i class='fa fa-search'></i></button>`
+                    }
+                },
+                {
+                    targets: "_all",
+                    className: "text-nowrap align-middle"
+                },
+            ],
         });
 
         function getMasterPlanData(type) {
@@ -979,6 +997,121 @@
             hideDefectAreaImage();
 
             Livewire.emit('hideDefectAreaImageClear');
+        }
+
+        let defectInOutDetailDatatable = $("#defect-in-out-detail-table").DataTable({
+            serverSide: true,
+            processing: true,
+            ordering: false,
+            pageLength: 50,
+            ajax: {
+                url: '{{ route('get-defect-in-out-detail') }}',
+                data: function (d) {
+                    d.tanggal = $("#defectInOutDetailDate").val();
+                },
+                dataType: 'json',
+            },
+            columns: [
+                {
+                    data: 'time_in',
+                },
+                {
+                    data: 'time_out',
+                },
+                {
+                    data: 'sewing_line',
+                },
+                {
+                    data: 'output_type',
+                },
+                {
+                    data: 'kode_numbering',
+                },
+                {
+                    data: 'no_ws',
+                },
+                {
+                    data: 'style',
+                },
+                {
+                    data: 'color',
+                },
+                {
+                    data: 'size',
+                },
+                {
+                    data: 'defect_type',
+                },
+                {
+                    data: 'defect_area',
+                },
+                {
+                    data: 'gambar',
+                },
+                {
+                    data: 'status',
+                },
+            ],
+            columnDefs: [
+                {
+                    targets: [2],
+                    render: (data, type, row, meta) => {
+                        return data ? data.replace("_", " ").toUpperCase() : '-';
+                    }
+                },
+                {
+                    targets: [3],
+                    render: (data, type, row, meta) => {
+                        let textColor = '';
+
+                        if (data == "packing") {
+                            textColor = "text-success";
+                        } else {
+                            textColor = "text-danger";
+                        }
+
+                        return `<span class="`+textColor+` fw-bold">`+(data ? data.toUpperCase() : '-')+`</span>`;
+                    }
+                },
+                {
+                    targets: [11],
+                    render: (data, type, row, meta) => {
+                        return `<button class="btn btn-dark" onclick="onShowDefectAreaImage('`+row.gambar+`', `+row.defect_area_x+`, `+row.defect_area_y+`)"><i class="fa fa-image"></i></button>`
+                    }
+                },
+                {
+                    targets: [12],
+                    render: (data, type, row, meta) => {
+                        let textColor = '';
+
+                        if (data == "reworked") {
+                            textColor = "text-rework";
+                        } else {
+                            textColor = "text-defect";
+                        }
+
+                        return `<span class="`+textColor+` fw-bold">`+(data ? data.toUpperCase() : '-')+`</span>`;
+                    }
+                },
+                {
+                    targets: "_all",
+                    className: "text-nowrap align-middle"
+                },
+            ],
+        });
+
+        function defectInOutDetailReload() {
+            $("#defect-in-out-detail-table").DataTable().ajax.reload(() => {
+                $("#defectInOutDetailQty").val(defectInOutDetailDatatable.page.info().recordsTotal);
+            });
+        }
+
+        async function getDefectInOutDetail(tanggal) {
+            $("#defectInOutDetailDate").val(tanggal);
+
+            defectInOutDetailReload();
+
+            $("#defect-in-out-modal").modal("show");
         }
     </script>
 @endpush
