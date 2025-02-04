@@ -483,7 +483,7 @@
                         <h5 class="card-title text-light text-center fw-bold">{{ Auth::user()->Groupp." " }}Defect In Out Summary</h5>
                         <div class="d-flex align-items-center">
                             <h5 class="px-3 mb-0 text-light">Total : <b>{{ $totalDefectInOut }}</b></h5>
-                            <button class="btn btn-dark float-end" wire:click="refreshComponent()">
+                            <button class="btn btn-dark float-end" wire:click="refreshComponent()" onclick="defectInOutReload()">
                                 <i class="fa-solid fa-rotate"></i>
                             </button>
                         </div>
@@ -534,13 +534,34 @@
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <div class="mb-3">
                                 <label class="form-label">Tanggal</label>
                                 <input type="text" class="form-control" id="defectInOutDetailDate" readonly>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">Line</label>
+                                <select class="form-select select2-defect-in-out-modal" id="defectInOutDetailLine" onchange="defectInOutDetailReload()">
+                                    <option value="" selected>All Line</option>
+                                    @foreach ($lines as $line)
+                                        <option value="{{ $line->username }}">{{ str_replace("_", " ", $line->username) }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">Department</label>
+                                <select class="form-select select2-defect-in-out-modal" id="defectInOutDetailDepartment" onchange="defectInOutDetailReload()">
+                                    <option value="">All Department</option>
+                                    <option value="qc">QC</option>
+                                    <option value="packing">Packing</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
                             <div class="mb-3">
                                 <label class="form-label">Total</label>
                                 <input type="text" class="form-control" id="defectInOutDetailQty" readonly>
@@ -597,6 +618,13 @@
                 theme: "bootstrap-5",
                 width: $( this ).data( 'width' ) ? $( this ).data( 'width' ) : $( this ).hasClass( 'w-100' ) ? '100%' : 'style',
                 placeholder: $( this ).data( 'placeholder' ),
+            });
+
+            $('.select2-defect-in-out-modal').select2({
+                theme: "bootstrap-5",
+                width: $( this ).data( 'width' ) ? $( this ).data( 'width' ) : $( this ).hasClass( 'w-100' ) ? '100%' : 'style',
+                placeholder: $( this ).data( 'placeholder' ),
+                dropdownParent: $('#defect-in-out-modal')
             });
 
             $('#select-defect-in-line').on('change', function (e) {
@@ -749,6 +777,10 @@
                 },
             ],
         });
+
+        function defectInOutReload() {
+            $("#defect-in-out-table").DataTable().ajax.reload();
+        }
 
         function getMasterPlanData(type) {
             if (type != "in" && type != "out") {
@@ -1009,6 +1041,8 @@
                 url: '{{ route('get-defect-in-out-detail') }}',
                 data: function (d) {
                     d.tanggal = $("#defectInOutDetailDate").val();
+                    d.line = $("#defectInOutDetailLine").val();
+                    d.departemen = $("#defectInOutDetailDepartment").val();
                 },
                 dataType: 'json',
             },
