@@ -491,6 +491,17 @@
                 </div>
                 <div class="card-body">
                     <div>
+                        <div class="d-flex align-items-end gap-3 mb-3">
+                            <div>
+                                <label class="form-label">From</label>
+                                <input type="date" class="form-control" value="{{ date("Y-m-d", strtotime("-7 days")) }}" id="dateFrom" onchange="defectInOutReload()" wire:model="defectInOutFrom">
+                            </div>
+                            <span class="mb-2">-</span>
+                            <div>
+                                <label class="form-label">To</label>
+                                <input type="date" class="form-control" value="{{ date("Y-m-d") }}" id="dateTo" onchange="defectInOutReload()" wire:model="defectInOutTo">
+                            </div>
+                        </div>
                         <div class="table-responsive" wire:ignore>
                             <table class="table table-bordered w-100" id="defect-in-out-table" >
                                 <thead>
@@ -746,6 +757,10 @@
             ajax: {
                 url: '{{ route('get-defect-in-out-daily') }}',
                 dataType: 'json',
+                data: function (d) {
+                    d.dateFrom = $("#dateFrom").val();
+                    d.dateTo = $("#dateTo").val();
+                }
             },
             columns: [
                 {

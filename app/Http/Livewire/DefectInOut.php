@@ -66,7 +66,8 @@ class DefectInOut extends Component
     public $defectOutSelectedArea;
 
     public $defectInOutSearch;
-
+    public $defectInOutFrom;
+    public $defectInOutTo;
     public $defectInOutOutputType;
 
     public $productTypeImage;
@@ -130,6 +131,8 @@ class DefectInOut extends Component
         $this->defectOutSearch = null;
         $this->defectOutListAllChecked = false;
 
+        $this->defectInOutFrom = date("Y-m-d", strtotime("-7 days"));
+        $this->defectInOutTo = date("Y-m-d");
         $this->defectInOutShowPage = 10;
 
         $this->productTypeImage = null;
@@ -1377,7 +1380,7 @@ class DefectInOut extends Component
                 SUM(CASE WHEN output_defect_in_out.status = 'reworked' THEN 1 ELSE 0 END) total_out
             ")->
             where("output_defect_in_out.type", strtolower(Auth::user()->Groupp))->
-            whereBetween("output_defect_in_out.updated_at", [date("Y-m-d", strtotime("-7 days")), date("Y-m-d")])->
+            whereBetween("output_defect_in_out.updated_at", [$this->defectInOutFrom." 00:00:00", $this->defectInOutTo." 23:59:59"])->
             groupByRaw("DATE(output_defect_in_out.updated_at)")->
             get();
 
