@@ -592,47 +592,47 @@ if (document.getElementById("alert-sound")) {
                 case "07:53" :
                     played = true;
                     // sound.play();
-                    showReminder(hoursminutes);
+                    // showReminder(hoursminutes);
                     break;
                 case "08:53" :
                     played = true;
                     // sound.play();
-                    showReminder(hoursminutes);
+                    // showReminder(hoursminutes);
                     break;
                 case "09:53" :
                     played = true;
                     // sound.play();
-                    showReminder(hoursminutes);
+                    // showReminder(hoursminutes);
                     break;
                 case "10:53" :
                     played = true;
                     // sound.play();
-                    showReminder(hoursminutes);
+                    // showReminder(hoursminutes);
                     break;
                 case "11:53" :
                     played = true;
                     // sound.play();
-                    showReminder(hoursminutes);
+                    // showReminder(hoursminutes);
                     break;
                 case "13:53" :
                     played = true;
                     // sound.play();
-                    showReminder(hoursminutes);
+                    // showReminder(hoursminutes);
                     break;
                 case "14:53" :
                     played = true;
                     // sound.play();
-                    showReminder(hoursminutes);
+                    // showReminder(hoursminutes);
                     break;
                 case "15:51" :
                     played = true;
                     // sound.play();
-                    showReminder(hoursminutes);
+                    // showReminder(hoursminutes);
                     break;
                 case "16:53" :
                     played = true;
                     // sound.play();
-                    showReminder(hoursminutes);
+                    // showReminder(hoursminutes);
                     break;
             }
         }
