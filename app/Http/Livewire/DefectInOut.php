@@ -1374,14 +1374,14 @@ class DefectInOut extends Component
 
         // All Defect
         $defectInOutDaily = DefectInOutModel::selectRaw("
-                DATE(output_defect_in_out.updated_at) tanggal,
+                DATE(output_defect_in_out.created_at) tanggal,
                 COUNT(output_defect_in_out.id) total_in,
                 SUM(CASE WHEN output_defect_in_out.status = 'defect' THEN 1 ELSE 0 END) total_process,
                 SUM(CASE WHEN output_defect_in_out.status = 'reworked' THEN 1 ELSE 0 END) total_out
             ")->
             where("output_defect_in_out.type", strtolower(Auth::user()->Groupp))->
-            whereBetween("output_defect_in_out.updated_at", [$this->defectInOutFrom." 00:00:00", $this->defectInOutTo." 23:59:59"])->
-            groupByRaw("DATE(output_defect_in_out.updated_at)")->
+            whereBetween("output_defect_in_out.created_at", [$this->defectInOutFrom." 00:00:00", $this->defectInOutTo." 23:59:59"])->
+            groupByRaw("DATE(output_defect_in_out.created_at)")->
             get();
 
         $defectInOutTotal = $defectInOutDaily->sum("total_in");
