@@ -223,6 +223,12 @@ class DefectInOutController extends Controller
     }
 
     public function getDefectInOutDetail(Request $request) {
+        // dd("(
+        //     (CASE WHEN output_defect_in_out.output_type = 'packing' THEN master_plan_packing.sewing_line ELSE master_plan.sewing_line END) LIKE '%".$request->line."%'
+        //     AND
+        //     output_defect_in_out.output_type LIKE '%".$request->departemen."%'
+        // )");
+
         $defectInOutQuery = DefectInOut::selectRaw("
                 output_defect_in_out.created_at time_in,
                 output_defect_in_out.reworked_at time_out,
@@ -259,7 +265,7 @@ class DefectInOutController extends Controller
             whereRaw("
                 (
                     (CASE WHEN output_defect_in_out.output_type = 'packing' THEN master_plan_packing.sewing_line ELSE master_plan.sewing_line END) LIKE '%".$request->line."%'
-                    AND
+                    OR
                     output_defect_in_out.output_type LIKE '%".$request->departemen."%'
                 )
             ")->
