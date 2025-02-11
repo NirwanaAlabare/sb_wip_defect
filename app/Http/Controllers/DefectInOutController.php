@@ -274,4 +274,51 @@ class DefectInOutController extends Controller
 
             return DataTables::of($defectInOutQuery)->toJson();
     }
+
+    public function getDefectInOutDetailTotal(Request $request) {
+        $defectInOutQuery = DefectInOut::selectRaw("
+                output_defect_in_out.created_at time_in,
+                output_defect_in_out.reworked_at time_out,
+                (CASE WHEN output_defect_in_out.output_type = 'packing' THEN master_plan_packing.sewing_line ELSE master_plan.sewing_line END) sewing_line,
+                output_defect_in_out.output_type,
+                output_defect_in_out.kode_numbering,
+                (CASE WHEN output_defect_in_out.output_type = 'packing' THEN act_costing_packing.kpno ELSE act_costing.kpno END) no_ws,
+                (CASE WHEN output_defect_in_out.output_type = 'packing' THEN act_costing_packing.kpno ELSE act_costing.styleno END) style,
+                (CASE WHEN output_defect_in_out.output_type = 'packing' THEN so_det_packing.color ELSE so_det.color END) color,
+                (CASE WHEN output_defect_in_out.output_type = 'packing' THEN so_det_packing.size ELSE so_det.size END) size,
+                (CASE WHEN output_defect_in_out.output_type = 'packing' THEN output_defect_types_packing.defect_type ELSE output_defect_types.defect_type END) defect_type,
+                (CASE WHEN output_defect_in_out.output_type = 'packing' THEN output_defect_areas_packing.defect_area ELSE output_defect_areas.defect_area END) defect_area,
+                (CASE WHEN output_defect_in_out.output_type = 'packing' THEN master_plan_packing.gambar ELSE master_plan.gambar END) gambar,
+                (CASE WHEN output_defect_in_out.output_type = 'packing' THEN output_defects_packing.defect_area_x ELSE output_defects.defect_area_x END) defect_area_x,
+                (CASE WHEN output_defect_in_out.output_type = 'packing' THEN output_defects_packing.defect_area_y ELSE output_defects.defect_area_y END) defect_area_y,
+                output_defect_in_out.status
+            ")->
+            leftJoin("output_defects", "output_defects.id", "=", "output_defect_in_out.defect_id")->
+            leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects.defect_type_id")->
+            leftJoin("output_defect_areas", "output_defect_areas.id", "=", "output_defects.defect_area_id")->
+            leftJoin("so_det", "so_det.id", "=", "output_defects.so_det_id")->
+            leftJoin("so", "so.id", "=", "so_det.id_so")->
+            leftJoin("act_costing", "act_costing.id", "=", "so.id_cost")->
+            leftJoin("master_plan", "master_plan.id", "=", "output_defects.master_plan_id")->
+            leftJoin("output_defects_packing", "output_defects_packing.id", "=", "output_defect_in_out.defect_id")->
+            leftJoin("output_defect_types as output_defect_types_packing", "output_defect_types_packing.id", "=", "output_defects_packing.defect_type_id")->
+            leftJoin("output_defect_areas as output_defect_areas_packing", "output_defect_areas_packing.id", "=", "output_defects_packing.defect_area_id")->
+            leftJoin("so_det as so_det_packing", "so_det_packing.id", "=", "output_defects_packing.so_det_id")->
+            leftJoin("so as so_packing", "so_packing.id", "=", "so_det_packing.id_so")->
+            leftJoin("act_costing as act_costing_packing", "act_costing_packing.id", "=", "so_packing.id_cost")->
+            leftJoin("master_plan as master_plan_packing", "master_plan_packing.id", "=", "output_defects_packing.master_plan_id")->
+            where("output_defect_in_out.type", strtolower(Auth::user()->Groupp))->
+            whereBetween("output_defect_in_out.created_at", [$request->tanggal." 00:00:00", $request->tanggal." 23:59:59"])->
+            whereRaw("
+                (
+                    output_defect_in_out.id IS NOT NULL
+                    ".($request->line ? "AND (CASE WHEN output_defect_in_out.output_type = 'packing' THEN master_plan_packing.sewing_line ELSE (CASE WHEN output_defect_in_out.output_type = 'qc' THEN master_plan.sewing_line ELSE null END) END) LIKE '%".$request->line."%'" : "")."
+                    ".($request->departemen ? "AND output_defect_in_out.output_type LIKE '%".$request->departemen."%'" : "")."
+                )
+            ")->
+            groupBy("output_defect_in_out.id")->
+            get();
+
+        return array("defectIn" => $defectInOutQuery->count(), "defectProcess" => $defectInOutQuery->where("status", "defect")->count(), "defectOut" => $defectInOutQuery->where("status", "reworked")->count());
+    }
 }
