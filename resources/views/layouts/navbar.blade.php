@@ -10,7 +10,7 @@
     <nav class="navbar bg-body-secondary navbar-expand">
         <div class="container-fluid">
             <div class="d-flex align-items-center">
-                <a class="navbar-brand" href="{{ url('/') }}"><img src="{{ asset('images/Frame 1.png') }}" alt="" width="130"></a>
+                <a class="navbar-brand" href="{{ url('/') }}"><img src="{{ asset('images/Frame 1.png') }}" alt="" width="120"></a>
                 <p class="mb-0 bg-defect p-1 text-light rounded-3 fw-bold">DEFECT IN-OUT</p>
             </div>
             <ul class="navbar-nav align-items-center gap-3">
