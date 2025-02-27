@@ -1134,15 +1134,15 @@ class DefectInOut extends Component
         }
 
         $this->defectInOutputModal = $thisData[3];
-        $this->defectInDateModal = $defectIn->tgl_plan;
-        $this->defectInLineModal = $defectIn->sewing_line;
-        $this->defectInMasterPlanTextModal = $defectIn->ws." - ".$defectIn->style." - ".$defectIn->color;
-        $this->defectInMasterPlanModal = $defectIn->master_plan_id;
-        $this->defectInSizeTextModal = $defectIn->size;
-        $this->defectInSizeModal = $defectIn->so_det_id;
-        $this->defectInTypeTextModal = $defectIn->defect_type;
-        $this->defectInTypeModal = $defectIn->defect_type_id;
-        $this->defectInQtyModal = $defectIn->defect_qty;
+        $this->defectInDateModal = $defectIn ? $defectIn->tgl_plan : null;
+        $this->defectInLineModal = $defectIn ? $defectIn->sewing_line : null;
+        $this->defectInMasterPlanTextModal = $defectIn ? $defectIn->ws." - ".$defectIn->style." - ".$defectIn->color : null;
+        $this->defectInMasterPlanModal = $defectIn ? $defectIn->master_plan_id : null;
+        $this->defectInSizeTextModal = $defectIn ? $defectIn->size : null;
+        $this->defectInSizeModal = $defectIn ? $defectIn->so_det_id : null;
+        $this->defectInTypeTextModal = $defectIn ? $defectIn->defect_type : null;
+        $this->defectInTypeModal = $defectIn ? $defectIn->defect_type_id : null;
+        $this->defectInQtyModal = $defectIn ? $defectIn->defect_qty : null;
 
         $this->emit('showModal', 'defectIn');
     }
@@ -1323,15 +1323,15 @@ class DefectInOut extends Component
         first();
 
         $this->defectOutOutputModal = $thisData[3];
-        $this->defectOutDateModal = $defectOut->tgl_plan;
-        $this->defectOutLineModal = $defectOut->sewing_line;
-        $this->defectOutMasterPlanTextModal = $defectOut->ws." - ".$defectOut->style." - ".$defectOut->color;
-        $this->defectOutMasterPlanModal = $defectOut->master_plan_id;
-        $this->defectOutSizeTextModal = $defectOut->size;
-        $this->defectOutSizeModal = $defectOut->so_det_id;
-        $this->defectOutTypeTextModal = $defectOut->defect_type;
-        $this->defectOutTypeModal = $defectOut->defect_type_id;
-        $this->defectOutQtyModal = $defectOut->defect_qty;
+        $this->defectOutDateModal = $defectOut ? $defectOut->tgl_plan : null;
+        $this->defectOutLineModal = $defectOut ? $defectOut->sewing_line : null;
+        $this->defectOutMasterPlanTextModal = $defectOut ? $defectOut->ws." - ".$defectOut->style." - ".$defectOut->color : null;
+        $this->defectOutMasterPlanModal = $defectOut ? $defectOut->master_plan_id : null;
+        $this->defectOutSizeTextModal = $defectOut ? $defectOut->size : null;
+        $this->defectOutSizeModal = $defectOut ? $defectOut->so_det_id : null;
+        $this->defectOutTypeTextModal = $defectOut ? $defectOut->defect_type : null;
+        $this->defectOutTypeModal = $defectOut ? $defectOut->defect_type_id : null;
+        $this->defectOutQtyModal = $defectOut ? $defectOut->defect_qty : null;
 
         $this->emit('showModal', 'defectOut');
     }
