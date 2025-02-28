@@ -202,8 +202,8 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">Department</label>
-                                    <input type="text" class="form-control form-control-sm d-none" wire:model="defectInOutputModal" readonly>
-                                    <input type="text" class="form-control form-control-sm" value="{{ strtoupper($defectInOutputModal) }}" readonly>
+                                    <input type="text" class="form-control form-control-sm d-none" wire:model="defectInOutputType" readonly>
+                                    <input type="text" class="form-control form-control-sm" value="{{ strtoupper($defectInOutputType) }}" readonly>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -433,8 +433,8 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">Department</label>
-                                    <input type="text" class="form-control form-control-sm d-none" wire:model="defectInOutputModal" readonly>
-                                    <input type="text" class="form-control form-control-sm" value="{{ strtoupper($defectInOutputModal) }}" readonly>
+                                    <input type="text" class="form-control form-control-sm d-none" wire:model="defectOutOutputType" readonly>
+                                    <input type="text" class="form-control form-control-sm" value="{{ strtoupper($defectOutOutputType) }}" readonly>
                                 </div>
                             </div>
                             <div class="col-md-6">

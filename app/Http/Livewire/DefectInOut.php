@@ -1298,6 +1298,7 @@ class DefectInOut extends Component
             output_defects.defect_type_id,
             output_defect_types.defect_type,
             output_defects.so_det_id,
+            output_defect_in_out.output_type,
             so_det.size,
             COUNT(output_defects.id) defect_qty
         ")->
