@@ -445,6 +445,7 @@ class DefectInOut extends Component
                     output_defects_packing.id as defect_id,
                     'defect' as status,
                     '".Auth::user()->Groupp."' as type,
+                    output_defects_packing.kode_numbering as kode_numbering,
                     'packing' as output_type,
                     '".Auth::user()->username."' as created_by,
                     '".Carbon::now()->addHour(7)->format("Y-m-d H:i:s")."' as created_at,
@@ -461,6 +462,7 @@ class DefectInOut extends Component
                     output_check_finishing.id as defect_id,
                     'defect' as status,
                     '".Auth::user()->Groupp."' as type,
+                    output_check_finishing.kode_numbering as kode_numbering,
                     'qcf' as output_type,
                     '".Auth::user()->username."' as created_by,
                     '".Carbon::now()->addHour(7)->format("Y-m-d H:i:s")."' as created_at,
@@ -477,6 +479,7 @@ class DefectInOut extends Component
                     output_defects.id as defect_id,
                     'defect' as status,
                     '".Auth::user()->Groupp."' as type,
+                    output_defects.kode_numbering as kode_numbering,
                     'qc' as output_type,
                     '".Auth::user()->username."' as created_by,
                     '".Carbon::now()->addHour(7)->format("Y-m-d H:i:s")."' as created_at,
@@ -581,6 +584,7 @@ class DefectInOut extends Component
                 output_defects_packing.id as defect_id,
                 'defect' as status,
                 '".Auth::user()->Groupp."' as type,
+                output_defects_packing.kode_numbering as kode_numbering,
                 'packing' as output_type,
                 '".Auth::user()->username."' as created_by,
                 '".Carbon::now()->addHour(7)->format("Y-m-d H:i:s")."' as created_at,
@@ -628,6 +632,7 @@ class DefectInOut extends Component
                 output_check_finishing.id as defect_id,
                 'defect' as status,
                 '".Auth::user()->Groupp."' as type,
+                output_check_finishing.kode_numbering as kode_numbering,
                 'qcf' as output_type,
                 '".Auth::user()->username."' as created_by,
                 '".Carbon::now()->addHour(7)->format("Y-m-d H:i:s")."' as created_at,
@@ -675,6 +680,7 @@ class DefectInOut extends Component
                 output_defects.id as defect_id,
                 'defect' as status,
                 '".Auth::user()->Groupp."' as type,
+                output_defects.kode_numbering as kode_numbering,
                 'qc' as output_type,
                 '".Auth::user()->username."' as created_by,
                 '".Carbon::now()->addHour(7)->format("Y-m-d H:i:s")."' as created_at,
@@ -749,6 +755,7 @@ class DefectInOut extends Component
                 output_defects_packing.id as defect_id,
                 'defect' as status,
                 '".Auth::user()->Groupp."' as type,
+                output_defects_packing.kode_numbering as kode_numbering,
                 'packing' as output_type,
                 '".Auth::user()->username."' as created_by,
                 '".Carbon::now()->addHour(7)->format("Y-m-d H:i:s")."' as created_at,
@@ -796,6 +803,7 @@ class DefectInOut extends Component
                 output_check_finishing.id as defect_id,
                 'defect' as status,
                 '".Auth::user()->Groupp."' as type,
+                output_check_finishing.kode_numbering as kode_numbering,
                 'qcf' as output_type,
                 '".Auth::user()->username."' as created_by,
                 '".Carbon::now()->addHour(7)->format("Y-m-d H:i:s")."' as created_at,
@@ -843,6 +851,7 @@ class DefectInOut extends Component
                 output_defects.id as defect_id,
                 'defect' as status,
                 '".Auth::user()->Groupp."' as type,
+                output_defects.kode_numbering as kode_numbering,
                 'qc' as output_type,
                 '".Auth::user()->username."' as created_by,
                 '".Carbon::now()->addHour(7)->format("Y-m-d H:i:s")."' as created_at,
@@ -1052,7 +1061,7 @@ class DefectInOut extends Component
             leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
             leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects_packing.defect_type_id")->
             leftJoin("output_defect_in_out", function ($join) {
-                $join->on("output_defect_in_out.id", "=", "output_defects_packing.id");
+                $join->on("output_defect_in_out.defect_id", "=", "output_defects_packing.id");
                 $join->on("output_defect_in_out.output_type", "=", DB::raw("'packing'"));
             })->
             where("output_defects_packing.defect_status", "defect")->
@@ -1088,7 +1097,7 @@ class DefectInOut extends Component
             leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
             leftJoin("output_defect_types", "output_defect_types.id", "=", "output_check_finishing.defect_type_id")->
             leftJoin("output_defect_in_out", function ($join) {
-                $join->on("output_defect_in_out.id", "=", "output_check_finishing.id");
+                $join->on("output_defect_in_out.defect_id", "=", "output_check_finishing.id");
                 $join->on("output_defect_in_out.output_type", "=", DB::raw("'qcf'"));
             })->
             where("output_check_finishing.status", "defect")->
@@ -1124,7 +1133,7 @@ class DefectInOut extends Component
             leftJoin("act_costing", "act_costing.id", "=", "master_plan.id_ws")->
             leftJoin("output_defect_types", "output_defect_types.id", "=", "output_defects.defect_type_id")->
             leftJoin("output_defect_in_out", function ($join) {
-                $join->on("output_defect_in_out.id", "=", "output_defects.id");
+                $join->on("output_defect_in_out.defect_id", "=", "output_defects.id");
                 $join->on("output_defect_in_out.output_type", "=", DB::raw("'qc'"));
             })->
             where("output_defects.defect_status", "defect")->
@@ -1162,6 +1171,7 @@ class DefectInOut extends Component
                 output_defects_packing.id as defect_id,
                 'defect' as status,
                 '".Auth::user()->Groupp."' as type,
+                output_defects_packing.kode_numbering as kode_numbering,
                 'packing' as output_type,
                 '".Auth::user()->username."' as created_by,
                 '".Carbon::now()->addHour(7)."' as created_at,
@@ -1199,6 +1209,7 @@ class DefectInOut extends Component
                 output_check_finishing.id as defect_id,
                 'defect' as status,
                 '".Auth::user()->Groupp."' as type,
+                output_check_finishing.kode_numbering as kode_numbering,
                 'qcf' as output_type,
                 '".Auth::user()->username."' as created_by,
                 '".Carbon::now()->addHour(7)."' as created_at,
@@ -1236,6 +1247,7 @@ class DefectInOut extends Component
                 output_defects.id as defect_id,
                 'defect' as status,
                 '".Auth::user()->Groupp."' as type,
+                output_defects.kode_numbering as kode_numbering,
                 'qc' as output_type,
                 '".Auth::user()->username."' as created_by,
                 '".Carbon::now()->addHour(7)."' as created_at,
