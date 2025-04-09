@@ -1064,12 +1064,14 @@ class DefectInOut extends Component
                 $join->on("output_defect_in_out.defect_id", "=", "output_defects_packing.id");
                 $join->on("output_defect_in_out.output_type", "=", DB::raw("'packing'"));
             })->
+            whereNotNull("output_defects_packing.id")->
+            whereNotNull("master_plan.id")->
+            whereNull("output_defect_in_out.id")->
             where("output_defects_packing.defect_status", "defect")->
             where("output_defect_types.allocation", Auth::user()->Groupp)->
             where("master_plan.id", $thisData[0])->
             where("output_defect_types.id", $thisData[1])->
             where("output_defects_packing.so_det_id", $thisData[2])->
-            whereNull("output_defect_in_out.id")->
             groupBy("master_plan.sewing_line", "master_plan.id", "output_defect_types.id", "output_defects_packing.so_det_id")->
             orderBy("master_plan.sewing_line")->
             orderBy("master_plan.id_ws")->
@@ -1461,9 +1463,9 @@ class DefectInOut extends Component
             })->
             whereNotNull("output_defects_packing.id")->
             whereNotNull("master_plan.id")->
+            whereNull("output_defect_in_out.id")->
             where("output_defects_packing.defect_status", "defect")->
             where("output_defect_types.allocation", Auth::user()->Groupp)->
-            whereNull("output_defect_in_out.id")->
             whereRaw("YEAR(output_defects_packing.updated_at) = '".date("Y")."'");
             if ($this->defectInSearch) {
                 $defectInQuery->whereRaw("(
@@ -1520,9 +1522,9 @@ class DefectInOut extends Component
             })->
             whereNotNull("output_check_finishing.id")->
             whereNotNull("master_plan.id")->
+            whereNull("output_defect_in_out.id")->
             where("output_check_finishing.status", "defect")->
             where("output_defect_types.allocation", Auth::user()->Groupp)->
-            whereNull("output_defect_in_out.id")->
             whereRaw("YEAR(output_check_finishing.updated_at) = '".date("Y")."'");
             if ($this->defectInSearch) {
                 $defectInQuery->whereRaw("(
@@ -1579,9 +1581,9 @@ class DefectInOut extends Component
             })->
             whereNotNull("output_defects.id")->
             whereNotNull("master_plan.id")->
+            whereNull("output_defect_in_out.id")->
             where("output_defects.defect_status", "defect")->
             where("output_defect_types.allocation", Auth::user()->Groupp)->
-            whereNull("output_defect_in_out.id")->
             whereRaw("YEAR(output_defects.updated_at) = '".date("Y")."'");
             if ($this->defectInSearch) {
                 $defectInQuery->whereRaw("(

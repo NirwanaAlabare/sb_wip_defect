@@ -56,7 +56,7 @@
                                 <label class="form-label fw-bold">Department</label>
                                 <select class="form-select" id="select-defect-in-output" wire:model="defectInOutputType">
                                     <option value="qc">QC</option>
-                                    <option value="qcf">QC FINISHING</option>
+                                    {{-- <option value="qcf">QC FINISHING</option> --}}
                                     <option value="packing">PACKING</option>
                                 </select>
                             </div>
@@ -287,7 +287,7 @@
                                 <label class="form-label fw-bold">Department</label>
                                 <select class="form-select" id="select-defect-out-output" wire:model="defectOutOutputType">
                                     <option value="qc">QC</option>
-                                    <option value="qcf">QC FINISH</option>
+                                    {{-- <option value="qcf">QC FINISH</option> --}}
                                     <option value="packing">PACKING</option>
                                 </select>
                             </div>
@@ -570,7 +570,7 @@
                                 <select class="form-select select2-defect-in-out-modal" id="defectInOutDetailDepartment" onchange="defectInOutDetailReload()">
                                     <option value="">All Department</option>
                                     <option value="qc">QC</option>
-                                    <option value="qcf">QC FINISH</option>
+                                    {{-- <option value="qcf">QC FINISH</option> --}}
                                     <option value="packing">Packing</option>
                                 </select>
                             </div>
