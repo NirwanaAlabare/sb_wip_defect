@@ -57,7 +57,7 @@
                                 <select class="form-select" id="select-defect-in-output" wire:model="defectInOutputType">
                                     <option value="qc">QC</option>
                                     {{-- <option value="qcf">QC FINISHING</option> --}}
-                                    <option value="packing">PACKING</option>
+                                    <option value="packing">FINISHING</option>
                                 </select>
                             </div>
                         </div>
@@ -166,7 +166,7 @@
                                                 <td>{{ $defectIn->size }}</td>
                                                 <td>{{ $defectIn->defect_type }}</td>
                                                 <td>{{ $defectIn->defect_qty }}</td>
-                                                <td class="fw-bold {{ $defectIn->output_type == 'qc' ? 'text-danger' : ($defectIn->output_type == 'qcf' ? 'text-pink' : 'text-success') }}">{{ strtoupper($defectIn->output_type) }}</td>
+                                                <td class="fw-bold {{ $defectIn->output_type == 'qc' ? 'text-danger' : ($defectIn->output_type == 'qcf' ? 'text-pink' : 'text-success') }}">{{ ($defectIn->output_type == "packing" ? "FINISHING" : strtoupper($defectIn->output_type)) }}</td>
                                                 <td class="d-none"><input class="form-check-input" type="checkbox" value="{{ $defectIn->master_plan_id.'-'.$defectIn->defect_type_id.'-'.$defectIn->so_det_id.'-'.$defectIn->output_type }}" style="scale: 1.3" {{ $thisDefectInChecked && $thisDefectInChecked->count() > 0 ? "checked" : ""  }} onchange="defectInCheck(this)"></td>
                                                 <td><button class="btn btn-sm btn-defect fw-bold" wire:click='preSaveSelectedDefectIn("{{ $defectIn->master_plan_id.'-'.$defectIn->defect_type_id.'-'.$defectIn->so_det_id.'-'.$defectIn->output_type }}")'>IN</button></td>
                                             </tr>
@@ -203,7 +203,7 @@
                                 <div class="mb-3">
                                     <label class="form-label">Department</label>
                                     <input type="text" class="form-control form-control-sm d-none" wire:model="defectInOutputType" readonly>
-                                    <input type="text" class="form-control form-control-sm" value="{{ strtoupper($defectInOutputType) }}" readonly>
+                                    <input type="text" class="form-control form-control-sm" value="{{ ($defectInOutputType && $defectInOutputType == "packing" ? "FINISHING" : strtoupper($defectInOutputType)) }}" readonly>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -288,7 +288,7 @@
                                 <select class="form-select" id="select-defect-out-output" wire:model="defectOutOutputType">
                                     <option value="qc">QC</option>
                                     {{-- <option value="qcf">QC FINISH</option> --}}
-                                    <option value="packing">PACKING</option>
+                                    <option value="packing">FINISHING</option>
                                 </select>
                             </div>
                         </div>
@@ -397,7 +397,7 @@
                                                 <td>{{ $defectOut->size }}</td>
                                                 <td>{{ $defectOut->defect_type }}</td>
                                                 <td>{{ $defectOut->defect_qty }}</td>
-                                                <td class="fw-bold {{ $defectOut->output_type == 'qc' ? 'text-danger' : ($defectOut->output_type == 'qcf' ? 'text-pink' : 'text-success') }}">{{ strtoupper($defectOut->output_type) }}</td>
+                                                <td class="fw-bold {{ $defectOut->output_type == 'qc' ? 'text-danger' : ($defectOut->output_type == 'qcf' ? 'text-pink' : 'text-success') }}">{{ $defectOut->output_type == "packing" ? "FINISHING" : strtoupper($defectOut->output_type) }}</td>
                                                 <td class="d-none"><input class="form-check-input" type="checkbox" value="{{ $defectOut->master_plan_id.'-'.$defectOut->defect_type_id.'-'.$defectOut->so_det_id.'-'.$defectOut->so_det_id }}" style="scale: 1.3" {{ $thisDefectOutChecked && $thisDefectOutChecked->count() > 0 ? "checked" : ""  }} onchange="defectOutCheck(this)"></td>
                                                 <td><button class="btn btn-sm btn-rework fw-bold" wire:click="preSaveSelectedDefectOut('{{ $defectOut->master_plan_id.'-'.$defectOut->defect_type_id.'-'.$defectOut->so_det_id.'-'.$defectOut->output_type }}')">OUT</button></td>
                                             </tr>
@@ -434,7 +434,7 @@
                                 <div class="mb-3">
                                     <label class="form-label">Department</label>
                                     <input type="text" class="form-control form-control-sm d-none" wire:model="defectOutOutputType" readonly>
-                                    <input type="text" class="form-control form-control-sm" value="{{ strtoupper($defectOutOutputType) }}" readonly>
+                                    <input type="text" class="form-control form-control-sm" value="{{ ($defectOutOutputType && $defectOutOutputType == "packing" ? "FINISHING" : strtoupper($defectOutOutputType)) }}" readonly>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -576,7 +576,7 @@
                                     <option value="">All Department</option>
                                     <option value="qc">QC</option>
                                     {{-- <option value="qcf">QC FINISH</option> --}}
-                                    <option value="packing">Packing</option>
+                                    <option value="packing">FINISHING</option>
                                 </select>
                             </div>
                         </div>
@@ -1138,7 +1138,7 @@
                             textColor = "text-danger";
                         }
 
-                        return `<span class="`+textColor+` fw-bold">`+(data ? data.toUpperCase() : '-')+`</span>`;
+                        return `<span class="`+textColor+` fw-bold">`+(data ? (data == "packing" ? "FINISHING" : data.toUpperCase()) : '-')+`</span>`;
                     }
                 },
                 {

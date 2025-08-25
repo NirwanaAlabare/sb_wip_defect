@@ -941,7 +941,7 @@ class DefectInOut extends Component
         //     $defectOutQuery->whereBetween("output_defect_in_out.updated_at", [$this->defectOutDate." 00:00:00", $this->defectOutDate." 23:59:59"]);
         // }
         if ($this->defectOutLine) {
-            $defectInQuery->where("master_plan.sewing_line", $this->defectOutLine);
+            $defectOutQuery->where("master_plan.sewing_line", $this->defectOutLine);
         }
         if ($this->defectOutSelectedMasterPlan) {
             $defectOutQuery->where("master_plan.id", $this->defectOutSelectedMasterPlan);
@@ -1006,7 +1006,7 @@ class DefectInOut extends Component
         //     $defectOutQuery->whereBetween("output_defect_in_out.updated_at", [$this->defectOutDate." 00:00:00", $this->defectOutDate." 23:59:59"]);
         // }
         if ($this->defectOutLine) {
-            $defectInQuery->where("master_plan.sewing_line", $this->defectOutLine);
+            $defectOutQuery->where("master_plan.sewing_line", $this->defectOutLine);
         }
         if ($this->defectOutSelectedMasterPlan) {
             $defectOutQuery->where("master_plan.id", $this->defectOutSelectedMasterPlan);
