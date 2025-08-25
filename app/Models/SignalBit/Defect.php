@@ -4,6 +4,7 @@ namespace App\Models\SignalBit;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Scopes\currentWorksheet;
 
 class Defect extends Model
 {
@@ -27,6 +28,13 @@ class Defect extends Model
         'created_at',
         'updated_at',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope(new currentWorksheet);
+    }
 
     protected $casts = [
         'created_at' => 'datetime:Y-m-d H:i:s',
