@@ -207,7 +207,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="row justify-content-end mt-3">
+                        <div class="row justify-content-end mt-3 d-none">
                             <div class="col-md-3">
                                 <button class="btn btn-defect btn-sm fw-bold w-100" wire:click='saveCheckedDefectIn()'>CHECKED DEFECT IN</button>
                             </div>
@@ -470,7 +470,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="row justify-content-end mt-3">
+                        <div class="row justify-content-end mt-3 d-none">
                             <div class="col-md-3">
                                 <button class="btn btn-rework btn-sm fw-bold w-100" wire:click='saveCheckedDefectOut()'>CHECKED DEFECT OUT</button>
                             </div>
