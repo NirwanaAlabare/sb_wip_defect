@@ -29,12 +29,12 @@ class DefectPacking extends Model
         'updated_at',
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
+    // protected static function boot()
+    // {
+    //     parent::boot();
 
-        static::addGlobalScope(new currentWorksheetPacking);
-    }
+    //     static::addGlobalScope(new currentWorksheetPacking);
+    // }
 
     protected $casts = [
         'created_at' => 'datetime:Y-m-d H:i:s',

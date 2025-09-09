@@ -29,12 +29,12 @@ class Defect extends Model
         'updated_at',
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
+    // protected static function boot()
+    // {
+    //     parent::boot();
 
-        static::addGlobalScope(new currentWorksheet);
-    }
+    //     static::addGlobalScope(new currentWorksheet);
+    // }
 
     protected $casts = [
         'created_at' => 'datetime:Y-m-d H:i:s',

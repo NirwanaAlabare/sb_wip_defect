@@ -1463,6 +1463,7 @@ class DefectInOut extends Component
             })->
             whereNotNull("output_defects_packing.id")->
             whereNotNull("master_plan.id")->
+            whereNull("output_defects.kode_numbering")->
             whereNull("output_defect_in_out.id")->
             where("output_defects_packing.defect_status", "defect")->
             where("output_defect_types.allocation", Auth::user()->Groupp)->
@@ -1522,6 +1523,7 @@ class DefectInOut extends Component
             })->
             whereNotNull("output_check_finishing.id")->
             whereNotNull("master_plan.id")->
+            whereNull("output_check_finishing.kode_numbering")->
             whereNull("output_defect_in_out.id")->
             where("output_check_finishing.status", "defect")->
             where("output_defect_types.allocation", Auth::user()->Groupp)->
@@ -1581,6 +1583,7 @@ class DefectInOut extends Component
             })->
             whereNotNull("output_defects.id")->
             whereNotNull("master_plan.id")->
+            whereNull("output_defects.kode_numbering")->
             whereNull("output_defect_in_out.id")->
             where("output_defects.defect_status", "defect")->
             where("output_defect_types.allocation", Auth::user()->Groupp)->
@@ -1597,7 +1600,7 @@ class DefectInOut extends Component
                 )");
             }
             if ($this->defectInDate) {
-                $defectInQuery->where("master_plan.tgl_plan", $this->defectInDate);
+                $defectInQuery->where("master_plan.tgl_plan", ">=", date('Y-m-d', strtotime($this->defectInDate.' -7 days')));
             }
             if ($this->defectInLine) {
                 $defectInQuery->where("master_plan.sewing_line", $this->defectInLine);
