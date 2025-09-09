@@ -39,6 +39,13 @@ class DefectInOut extends Component
     public $defectInAreaModal;
     public $defectInQtyModal;
 
+    // Filter
+    public $defectInFilterWaktu;
+    public $defectInFilterLine;
+    public $defectInFilterMasterPlan;
+    public $defectInFilterSize;
+    public $defectInFilterType;
+
     public $defectOutDate;
     public $defectOutLine;
     public $defectOutOutputType;
@@ -52,6 +59,13 @@ class DefectInOut extends Component
     public $defectOutTypeModal;
     public $defectOutAreaModal;
     public $defectOutQtyModal;
+
+    // Filter
+    public $defectOutFilterWaktu;
+    public $defectOutFilterLine;
+    public $defectOutFilterMasterPlan;
+    public $defectOutFilterSize;
+    public $defectOutFilterType;
 
     public $defectInMasterPlanOutput;
     public $defectOutMasterPlanOutput;
@@ -116,6 +130,12 @@ class DefectInOut extends Component
         $this->defectInSearch = null;
         $this->defectInListAllChecked = null;
 
+        $this->defectInFilterWaktu = null;
+        $this->defectInFilterLine = null;
+        $this->defectInFilterMasterPlan = null;
+        $this->defectInFilterSize = null;
+        $this->defectInFilterType = null;
+
         // Defect Out init value
         $this->defectOutShowPage = 10;
         $this->defectOutOutputType = 'qc';
@@ -131,6 +151,12 @@ class DefectInOut extends Component
         $this->defectOutSelectedList = [];
         $this->defectOutSearch = null;
         $this->defectOutListAllChecked = false;
+
+        $this->defectOutFilterWaktu = null;
+        $this->defectOutFilterLine = null;
+        $this->defectOutFilterMasterPlan = null;
+        $this->defectOutFilterSize = null;
+        $this->defectOutFilterType = null;
 
         $this->defectInOutFrom = date("Y-m-d", strtotime("-7 days"));
         $this->defectInOutTo = date("Y-m-d");
@@ -1494,6 +1520,25 @@ class DefectInOut extends Component
             if ($this->defectInSelectedType) {
                 $defectInQuery->where("output_defects_packing.defect_type_id", $this->defectInSelectedType);
             }
+            if ($this->defectInFilterWaktu) {
+                $defectInQuery->where("output_defects_packing.updated_at", "LIKE", "%".$this->defectInFilterWaktu."%");
+            }
+            if ($this->defectInFilterLine) {
+                $defectInQuery->where("master_plan.sewing_line", "LIKE", "%".str_replace(" ", "_", $this->defectInFilterLine)."%");
+            }
+            if ($this->defectInFilterMasterPlan) {
+                $defectInQuery->whereRaw("(
+                    act_costing.kpno LIKE '%".$this->defectInFilterMasterPlan."%' OR
+                    act_costing.styleno LIKE '%".$this->defectInFilterMasterPlan."%' OR
+                    master_plan.color LIKE '%".$this->defectInFilterMasterPlan."%'
+                )");
+            }
+            if ($this->defectInFilterSize) {
+                $defectInQuery->where("so_det.size", "LIKE", "%".$this->defectInFilterSize."%");
+            }
+            if ($this->defectInFilterType) {
+                $defectInQuery->where("output_defect_types.defect_type", "LIKE", "%".str_replace(" ", "_", $this->defectInFilterType)."%");
+            }
             $defectInList = $defectInQuery->
                 groupBy("master_plan.sewing_line", "master_plan.id", "output_defect_types.id", "output_defects_packing.so_det_id", "output_defects_packing.updated_at")->
                 orderBy("output_defects_packing.updated_at", "desc");
@@ -1554,6 +1599,25 @@ class DefectInOut extends Component
             if ($this->defectInSelectedType) {
                 $defectInQuery->where("output_check_finishing.defect_type_id", $this->defectInSelectedType);
             }
+            if ($this->defectInFilterWaktu) {
+                $defectInQuery->where("output_check_finishing.updated_at", "LIKE", "%".$this->defectInFilterWaktu."%");
+            }
+            if ($this->defectInFilterLine) {
+                $defectInQuery->where("master_plan.sewing_line", "LIKE", "%".str_replace(" ", "_", $this->defectInFilterLine)."%");
+            }
+            if ($this->defectInFilterMasterPlan) {
+                $defectInQuery->whereRaw("(
+                    act_costing.kpno LIKE '%".$this->defectInFilterMasterPlan."%' OR
+                    act_costing.styleno LIKE '%".$this->defectInFilterMasterPlan."%' OR
+                    master_plan.color LIKE '%".$this->defectInFilterMasterPlan."%'
+                )");
+            }
+            if ($this->defectInFilterSize) {
+                $defectInQuery->where("so_det.size", "LIKE", "%".$this->defectInFilterSize."%");
+            }
+            if ($this->defectInFilterType) {
+                $defectInQuery->where("output_defect_types.defect_type", "LIKE", "%".str_replace(" ", "_", $this->defectInFilterType)."%");
+            }
             $defectInList = $defectInQuery->
                 groupBy("master_plan.sewing_line", "master_plan.id", "output_defect_types.id", "output_check_finishing.so_det_id", "output_check_finishing.updated_at")->
                 orderBy("output_check_finishing.updated_at", "desc");
@@ -1613,6 +1677,25 @@ class DefectInOut extends Component
             }
             if ($this->defectInSelectedType) {
                 $defectInQuery->where("output_defects.defect_type_id", $this->defectInSelectedType);
+            }
+            if ($this->defectInFilterWaktu) {
+                $defectInQuery->where("output_defects.updated_at", "LIKE", "%".$this->defectInFilterWaktu."%");
+            }
+            if ($this->defectInFilterLine) {
+                $defectInQuery->where("master_plan.sewing_line", "LIKE", "%".str_replace(" ", "_", $this->defectInFilterLine)."%");
+            }
+            if ($this->defectInFilterMasterPlan) {
+                $defectInQuery->whereRaw("(
+                    act_costing.kpno LIKE '%".$this->defectInFilterMasterPlan."%' OR
+                    act_costing.styleno LIKE '%".$this->defectInFilterMasterPlan."%' OR
+                    master_plan.color LIKE '%".$this->defectInFilterMasterPlan."%'
+                )");
+            }
+            if ($this->defectInFilterSize) {
+                $defectInQuery->where("so_det.size", "LIKE", "%".$this->defectInFilterSize."%");
+            }
+            if ($this->defectInFilterType) {
+                $defectInQuery->where("output_defect_types.defect_type", "LIKE", "%".str_replace(" ", "_", $this->defectInFilterType)."%");
             }
             $defectInList = $defectInQuery->
                 groupBy("master_plan.sewing_line", "master_plan.id", "output_defect_types.id", "output_defects.so_det_id", "output_defects.updated_at")->
@@ -1679,6 +1762,25 @@ class DefectInOut extends Component
         }
         if ($this->defectOutSelectedType) {
             $defectOutQuery->where("output_defects.defect_type_id", $this->defectOutSelectedType);
+        }
+        if ($this->defectOutFilterWaktu) {
+            $defectOutQuery->where("output_defect_in_out.updated_at", "LIKE", "%".$this->defectOutFilterWaktu."%");
+        }
+        if ($this->defectOutFilterLine) {
+            $defectOutQuery->where("master_plan.sewing_line", "LIKE", "%".str_replace(" ", "_", $this->defectOutFilterLine)."%");
+        }
+        if ($this->defectOutFilterMasterPlan) {
+            $defectOutQuery->whereRaw("(
+                act_costing.kpno LIKE '%".$this->defectOutFilterMasterPlan."%' OR
+                act_costing.styleno LIKE '%".$this->defectOutFilterMasterPlan."%' OR
+                master_plan.color LIKE '%".$this->defectOutFilterMasterPlan."%'
+            )");
+        }
+        if ($this->defectOutFilterSize) {
+            $defectOutQuery->where("so_det.size", "LIKE", "%".$this->defectOutFilterSize."%");
+        }
+        if ($this->defectOutFilterType) {
+            $defectOutQuery->where("output_defect_types.defect_type", "LIKE", "%".$this->defectOutFilterType."%");
         }
 
         $this->defectOutList = $defectOutQuery->
