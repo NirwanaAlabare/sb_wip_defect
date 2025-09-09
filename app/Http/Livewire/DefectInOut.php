@@ -1489,7 +1489,7 @@ class DefectInOut extends Component
             })->
             whereNotNull("output_defects_packing.id")->
             whereNotNull("master_plan.id")->
-            whereNull("output_defects.kode_numbering")->
+            whereNull("output_defects_packing.kode_numbering")->
             whereNull("output_defect_in_out.id")->
             where("output_defects_packing.defect_status", "defect")->
             where("output_defect_types.allocation", Auth::user()->Groupp)->

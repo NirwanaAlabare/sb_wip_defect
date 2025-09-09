@@ -1,5 +1,5 @@
 <div>
-    <div class="loading-container-fullscreen" wire:loading wire:target="changeMode, preSaveSelectedDefectIn, saveSelectedDefectIn, saveCheckedDefectIn, saveAllDefectIn, preSaveSelectedDefectOut, saveSelectedDefectOut, saveCheckedDefectOut, saveAllDefectOut, defectInDate, defectInOutputType, defectInLine, defectOutDate, defectOutOutputType, defectOutLine, refreshComponent, showDefectAreaImage, defectOutFilterKode, defectInFilterKode, defectOutFilterWaktu, defectInFilterWaktu, defectOutFilterLine, defectInFilterLine, defectOutFilterMasterPlan, defectInFilterMasterPlan, defectOutFilterSize, defectInFilterSize, defectOutFilterType, defectInFilterType">
+    <div class="loading-container-fullscreen" wire:loading wire:target="changeMode, preSaveSelectedDefectIn, saveSelectedDefectIn, saveCheckedDefectIn, saveAllDefectIn, preSaveSelectedDefectOut, saveSelectedDefectOut, saveCheckedDefectOut, saveAllDefectOut, defectInDate, defectInOutputType, defectInLine, defectOutDate, defectOutOutputType, defectOutLine, refreshComponent, showDefectAreaImage, defectOutFilterWaktu, defectInFilterWaktu, defectOutFilterLine, defectInFilterLine, defectOutFilterMasterPlan, defectInFilterMasterPlan, defectOutFilterSize, defectInFilterSize, defectOutFilterType, defectInFilterType">
         <div class="loading-container">
             <div class="loading"></div>
         </div>
@@ -144,9 +144,6 @@
                                     <tr class="text-center align-middle">
                                         <td>
 
-                                        </td>
-                                        <td>
-                                            <input type="text" class="form-control" wire:model="defectInFilterKode">
                                         </td>
                                         <td>
                                             <input type="text" class="form-control" wire:model="defectInFilterWaktu">
@@ -407,9 +404,6 @@
                                     <tr class="text-center align-middle">
                                         <td>
 
-                                        </td>
-                                        <td>
-                                            <input type="text" class="form-control" wire:model="defectOutFilterKode">
                                         </td>
                                         <td>
                                             <input type="text" class="form-control" wire:model="defectOutFilterWaktu">
