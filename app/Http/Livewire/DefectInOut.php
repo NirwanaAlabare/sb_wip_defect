@@ -1584,9 +1584,9 @@ class DefectInOut extends Component
                     so_det.size LIKE '%".$this->defectInSearch."%'
                 )");
             }
-            if ($this->defectInDate) {
-                $defectInQuery->where("master_plan.tgl_plan", $this->defectInDate);
-            }
+            // if ($this->defectInDate) {
+            //     $defectInQuery->where("master_plan.tgl_plan", $this->defectInDate);
+            // }
             if ($this->defectInLine) {
                 $defectInQuery->where("master_plan.sewing_line", $this->defectInLine);
             }
@@ -1663,9 +1663,9 @@ class DefectInOut extends Component
                     so_det.size LIKE '%".$this->defectInSearch."%'
                 )");
             }
-            if ($this->defectInDate) {
-                $defectInQuery->where("master_plan.tgl_plan", ">=", date('Y-m-d', strtotime($this->defectInDate.' -7 days')));
-            }
+            // if ($this->defectInDate) {
+            //     $defectInQuery->where("master_plan.tgl_plan", ">=", date('Y-m-d', strtotime($this->defectInDate.' -7 days')));
+            // }
             if ($this->defectInLine) {
                 $defectInQuery->where("master_plan.sewing_line", $this->defectInLine);
             }
