@@ -43,9 +43,9 @@ class ProfileContent extends Component
             if ($this->masterPlan) {
                 $totalRftSql->where('master_plan.id', $this->masterPlan);
             }
-        $totalRft = $totalRftSql->whereRaw("DATE(output_rfts.created_at) >= '".$this->dateFrom."'")->
+        $totalRft = $totalRftSql->whereRaw("output_rfts.created_at >= '".$this->dateFrom." 00:00:00'")->
             where("status", "NORMAL")->
-            whereRaw("DATE(output_rfts.created_at) <= '".$this->dateTo."'")->
+            whereRaw("output_rfts.created_at <= '".$this->dateTo." 23:59:59'")->
             count();
 
         $totalDefectSql = Defect::select('output_defects.*')->
@@ -58,8 +58,8 @@ class ProfileContent extends Component
             if ($this->masterPlan) {
                 $totalDefectSql->where('master_plan.id', $this->masterPlan);
             }
-        $totalDefect = $totalDefectSql->whereRaw("DATE(output_defects.created_at) >= '".$this->dateFrom."'")->
-            whereRaw("DATE(output_defects.created_at) <= '".$this->dateTo."'")->
+        $totalDefect = $totalDefectSql->whereRaw("output_defects.created_at >= '".$this->dateFrom." 00:00:00'")->
+            whereRaw("output_defects.created_at <= '".$this->dateTo." 23:59:59'")->
             count();
 
         $totalRejectSql = Reject::select('output_rejects.*')->
@@ -70,8 +70,8 @@ class ProfileContent extends Component
             if ($this->masterPlan) {
                 $totalRejectSql->where('master_plan.id', $this->masterPlan);
             }
-        $totalReject = $totalRejectSql->whereRaw("DATE(output_rejects.created_at) >= '".$this->dateFrom."'")->
-            whereRaw("DATE(output_rejects.created_at) <= '".$this->dateTo."'")->
+        $totalReject = $totalRejectSql->whereRaw("output_rejects.created_at >= '".$this->dateFrom." 00:00:00'")->
+            whereRaw("output_rejects.created_at <= '".$this->dateTo." 23:59:59'")->
             count();
 
         $totalReworkSql = Rework::select('output_reworks.*')->
@@ -84,8 +84,8 @@ class ProfileContent extends Component
             if ($this->masterPlan) {
                 $totalReworkSql->where('master_plan.id', $this->masterPlan);
             }
-        $totalRework = $totalReworkSql->whereRaw("DATE(output_reworks.created_at) >= '".$this->dateFrom."'")->
-            whereRaw("DATE(output_reworks.created_at) <= '".$this->dateTo."'")->
+        $totalRework = $totalReworkSql->whereRaw("output_reworks.created_at >= '".$this->dateFrom." 00:00:00'")->
+            whereRaw("output_reworks.created_at <= '".$this->dateTo." 23:59:59'")->
             count();
 
         return view('livewire.profile-content', [

@@ -73,10 +73,10 @@ class HistoryContent extends Component
                 )");
             }
             if ($this->dateFrom) {
-                $defectInOutQuery->whereRaw("DATE(COALESCE(output_defect_in_out.reworked_at, output_defect_in_out.updated_at)) >= '".$this->dateFrom."'");
+                $defectInOutQuery->whereRaw("output_defect_in_out.updated_at >= '".$this->dateFrom." 00:00:00'");
             }
             if ($this->dateTo) {
-                $defectInOutQuery->whereRaw("DATE(COALESCE(output_defect_in_out.reworked_at, output_defect_in_out.updated_at)) <= '".$this->dateTo."'");
+                $defectInOutQuery->whereRaw("output_defect_in_out.updated_at <= '".$this->dateTo." 23:59:59'");
             }
             $latestDefectInOut = $defectInOutQuery->
                 groupByRaw("
